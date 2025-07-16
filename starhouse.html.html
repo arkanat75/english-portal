@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Magical Star House - Interactive Exercises</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
+            color: #333;
+            margin: 20px;
+            text-align: center;
+            animation: sparkle-bg 5s infinite;
+        }
+        @keyframes sparkle-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        h1, h2, h3 {
+            color: #2f4f4f;
+            background: linear-gradient(45deg, #4682b4, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        .text-container, .exercise-container {
+            background: linear-gradient(135deg, #ffffff, #f0f0ff);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 255, 0.3), 0 0 20px rgba(255, 105, 180, 0.3);
+        }
+        .exercise-container {
+            text-align: left;
+        }
+        .true-false, .multiple-choice, .fill-blanks, .prepositions, .make-sentence, .answer-questions, .find-describe {
+            margin: 20px 0;
+        }
+        button {
+            background: linear-gradient(45deg, #4682b4, #ff69b4);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 15px auto;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 2px solid #4682b4;
+            border-radius: 5px;
+            background-color: #f9f9ff;
+        }
+        .drag-word, .drop-area {
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            border: 2px solid #4682b4;
+            border-radius: 10px;
+            cursor: move;
+            min-width: 100px;
+            text-align: center;
+            background: linear-gradient(45deg, #e6e6fa, #ffffff);
+            transition: transform 0.2s;
+        }
+        .drag-word:hover, .drop-area:hover {
+            transform: scale(1.05);
+        }
+        .drop-area {
+            min-height: 40px;
+            background: #f0f0ff;
+        }
+        .correct {
+            border-color: #00ced1 !important;
+            background: linear-gradient(45deg, #40e0d0, #00ced1) !important;
+            animation: sparkle 1s infinite;
+        }
+        .incorrect {
+            border-color: #ff69b4 !important;
+            background: linear-gradient(45deg, #ff69b4, #c71585) !important;
+            animation: sparkle 1s infinite;
+        }
+        @keyframes sparkle {
+            0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+        }
+        .sentence-input {
+            width: 80%;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        sup {
+            cursor: pointer;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+        .tooltip {
+            display: none;
+            position: absolute;
+            background: linear-gradient(45deg, #f0f0ff, #ffffff);
+            border: 2px solid #4682b4;
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+        .true-false .answer-radio {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4682b4;
+            border-radius: 50%;
+            margin: 0 10px;
+            cursor: pointer;
+            position: relative;
+            vertical-align: middle;
+        }
+        .true-false .answer-radio.selected::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #1e90ff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .true-false .answer-radio.correct {
+            border-color: #00ced1 !important;
+            background: linear-gradient(45deg, #40e0d0, #00ced1) !important;
+            animation: sparkle 1s infinite;
+        }
+        .true-false .answer-radio.incorrect {
+            border-color: #ff69b4 !important;
+            background: linear-gradient(45deg, #ff69b4, #c71585) !important;
+            animation: sparkle 1s infinite;
+        }
+        .true-false .answer-buttons {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .words {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .words .row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .words .drag-word {
+            flex: 1;
+            margin: 0 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Magical Star House</h1>
+    <div class="text-container">
+        <p>Hello! I’m Tom, and I live in an amazing house shaped like a giant star! It’s in a small village with green hills around it. Our star house is big, shiny, and very special. It has three floors and a twinkly<sup title="Shining with small flashes of light (сверкающий маленькими огоньками)">[1]</sup> garden in front of it. In the garden, there are bright flowers, a small fountain, and a glowing<sup title="Giving soft light (излучающий мягкий свет)">[2]</sup> star statue. A silver fence goes around the garden, and it sparkles<sup title="Shines with bright, small lights (блестит яркими огоньками)">[3]</sup> in the sunlight.</p>
+        <p>On the ground floor, there is a cosy living room, a shiny kitchen, and a bathroom. The living room is my favourite place. There is a big, soft sofa, a television, and a huge star-shaped window. We watch films and play board games there. The kitchen is silver and bright. My mum cooks tasty meals there, and we eat at a star-shaped table. In the bathroom, there is a round bathtub and a shiny mirror.</p>
+        <p>On the first floor, there are three bedrooms and another bathroom. My bedroom is small but magical. There is a blue bed, a desk for my homework, and a shelf with my favourite books and toys. My sister’s bedroom is purple, and there is a small telescope by her window to look at the stars. My parents’ bedroom is the biggest. There is a large bed and a wardrobe for their clothes.</p>
+        <p>On the top floor, there is a special mysterious room. There is a big telescope and comfortable chairs. We look at the night sky and see real stars! Outside, there is a garage for our car. In the backyard, there is a swing shaped like a crescent moon<sup title="A shape like a curved moon (форма, похожая на изогнутую луну)">[4]</sup> and a table for picnics under the stars.</p>
+        <p>Our house is full of magic and light. Every room feels warm and happy. I love my star house!</p>
+    </div>
+
+    <div class="exercise-container">
+        <h2>Exercises</h2>
+
+        <!-- Exercise 1: True or False -->
+        <div class="true-false">
+            <h3>1. True or False</h3>
+            <p>Read the text and click the circle next to True or False.</p>
+            <form id="trueFalseForm">
+                <p>1. Tom’s house is shaped like a circle. <span class="answer-buttons" data-id="q1"><span class="answer-radio" data-value="false"></span>False <span class="answer-radio" data-value="true"></span>True</p>
+                <p>2. There is a fountain in the garden. <span class="answer-buttons" data-id="q2"><span class="answer-radio" data-value="true"></span>True <span class="answer-radio" data-value="false"></span>False</p>
+                <p>3. The living room has a star-shaped table. <span class="answer-buttons" data-id="q3"><span class="answer-radio" data-value="false"></span>False <span class="answer-radio" data-value="true"></span>True</p>
+                <p>4. Tom’s bedroom is purple. <span class="answer-buttons" data-id="q4"><span class="answer-radio" data-value="false"></span>False <span class="answer-radio" data-value="true"></span>True</p>
+                <p>5. There is a telescope in the mysterious room. <span class="answer-buttons" data-id="q5"><span class="answer-radio" data-value="true"></span>True <span class="answer-radio" data-value="false"></span>False</p>
+                <p>6. The swing in the backyard is shaped like a star. <span class="answer-buttons" data-id="q6"><span class="answer-radio" data-value="false"></span>False <span class="answer-radio" data-value="true"></span>True</p>
+                <button type="button" onclick="checkTrueFalse()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 2: Match the Word to the Meaning -->
+        <div class="match-words">
+            <h3>2. Match the Word to the Meaning</h3>
+            <p>Drag the words to the correct meanings.</p>
+            <div class="words">
+                <div class="row">
+                    <div class="drag-word" draggable="true" data-answer="d">Cosy</div>
+                    <div class="drag-word" draggable="true" data-answer="f">Fountain</div>
+                    <div class="drag-word" draggable="true" data-answer="a">Wardrobe</div>
+                </div>
+                <div class="row">
+                    <div class="drag-word" draggable="true" data-answer="b">Telescope</div>
+                    <div class="drag-word" draggable="true" data-answer="e">Shelf</div>
+                    <div class="drag-word" draggable="true" data-answer="c">Garage</div>
+                </div>
+            </div>
+            <div class="meanings">
+                <p>a. A place to keep clothes. <div class="drop-area" data-id="a"></div></p>
+                <p>b. A device for looking at stars. <div class="drop-area" data-id="b"></div></p>
+                <p>c. A place to park a car. <div class="drop-area" data-id="c"></div></p>
+                <p>d. Comfortable and warm. <div class="drop-area" data-id="d"></div></p>
+                <p>e. A place to keep books or toys. <div class="drop-area" data-id="e"></div></p>
+                <p>f. A structure that sprays water. <div class="drop-area" data-id="f"></div></p>
+            </div>
+            <button type="button" onclick="checkMatching()">Check Answers</button>
+        </div>
+
+        <!-- Exercise 3: Fill in the Blanks with There is/There are -->
+        <div class="fill-blanks">
+            <h3>3. Fill in the Blanks with There is/There are</h3>
+            <form id="fillBlanksForm">
+                <p>1. _____ a big sofa in the living room. <input type="text" name="q1"></p>
+                <p>2. _____ bright flowers in the garden. <input type="text" name="q2"></p>
+                <p>3. _____ three bedrooms on the first floor. <input type="text" name="q3"></p>
+                <p>4. _____ a round bathtub in the bathroom. <input type="text" name="q4"></p>
+                <p>5. _____ a swing in the backyard. <input type="text" name="q5"></p>
+                <p>6. _____ a telescope in the mysterious room. <input type="text" name="q6"></p>
+                <button type="button" onclick="checkFillBlanks()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 4: Choose the Correct Answer -->
+        <div class="multiple-choice">
+            <h3>4. Choose the Correct Answer</h3>
+            <form id="multipleChoiceForm">
+                <p>1. Where is the garden?</p>
+                <select name="q1">
+                    <option value="">Choose</option>
+                    <option value="b">In front of the house</option>
+                    <option value="a">Behind the house</option>
+                    <option value="c">On the top floor</option>
+                </select>
+                <p>2. What is in the living room?</p>
+                <select name="q2">
+                    <option value="">Choose</option>
+                    <option value="a">A bed</option>
+                    <option value="b">A sofa and a television</option>
+                    <option value="c">A telescope</option>
+                </select>
+                <p>3. What colour is Tom’s bedroom?</p>
+                <select name="q3">
+                    <option value="">Choose</option>
+                    <option value="a">Blue</option>
+                    <option value="b">Purple</option>
+                    <option value="c">Silver</option>
+                </select>
+                <p>4. Who cooks in the kitchen?</p>
+                <select name="q4">
+                    <option value="">Choose</option>
+                    <option value="a">Tom</option>
+                    <option value="b">Tom’s mum</option>
+                    <option value="c">Tom’s sister</option>
+                </select>
+                <p>5. What is in the backyard?</p>
+                <select name="q5">
+                    <option value="">Choose</option>
+                    <option value="a">A fountain</option>
+                    <option value="b">A crescent moon swing</option>
+                    <option value="c">A wardrobe</option>
+                </select>
+                <p>6. What is on the top floor?</p>
+                <select name="q6">
+                    <option value="">Choose</option>
+                    <option value="a">A kitchen</option>
+                    <option value="b">A mysterious room</option>
+                    <option value="c">A garage</option>
+                </select>
+                <button type="button" onclick="checkMultipleChoice()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 5: Write the Correct Preposition -->
+        <div class="prepositions">
+            <h3>5. Write the Correct Preposition</h3>
+            <form id="prepositionsForm">
+                <p>1. The garden is _____ front of the house. <input type="text" name="q1"></p>
+                <p>2. We watch films _____ the living room. <input type="text" name="q2"></p>
+                <p>3. My books are _____ the shelf. <input type="text" name="q3"></p>
+                <p>4. We eat _____ the kitchen table. <input type="text" name="q4"></p>
+                <p>5. The telescope is _____ the window in the mysterious room. <input type="text" name="q5"></p>
+                <p>6. The swing is _____ the backyard. <input type="text" name="q6"></p>
+                <button type="button" onclick="checkPrepositions()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 6: Make a Sentence -->
+        <div class="make-sentence">
+            <h3>6. Make a Sentence</h3>
+            <p>Write the correct sentence using the given words.</p>
+            <form id="makeSentenceForm">
+                <p>1. house / Tom / in / lives / star / a <input type="text" class="sentence-input" name="s1"></p>
+                <p>2. has / garden / flowers / the / bright <input type="text" class="sentence-input" name="s2"></p>
+                <p>3. sofa / living room / there / a / is / big <input type="text" class="sentence-input" name="s3"></p>
+                <p>4. blue / Tom’s / is / bedroom <input type="text" class="sentence-input" name="s4"></p>
+                <p>5. mum / cooks / kitchen / Tom’s / in <input type="text" class="sentence-input" name="s5"></p>
+                <p>6. crescent / swing / backyard / a / is / there / moon <input type="text" class="sentence-input" name="s6"></p>
+                <button type="button" onclick="checkSentences()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 7: Answer the Questions -->
+        <div class="answer-questions">
+            <h3>7. Answer the Questions</h3>
+            <form id="answerQuestionsForm">
+                <p>1. What does Tom’s house look like? <input type="text" class="sentence-input" name="q1"></p>
+                <p>2. What is Tom’s favourite room? <input type="text" class="sentence-input" name="q2"></p>
+                <p>3. What colour is the kitchen? <input type="text" class="sentence-input" name="q3"></p>
+                <p>4. What is in Tom’s bedroom? <input type="text" class="sentence-input" name="q4"></p>
+                <p>5. What does Tom’s mum do in the kitchen? <input type="text" class="sentence-input" name="q5"></p>
+                <p>6. Why does Tom love his house? <input type="text" class="sentence-input" name="q6"></p>
+                <button type="button" onclick="checkOpenAnswers()">Check Answers</button>
+            </form>
+        </div>
+
+        <!-- Exercise 8: Find in the Text -->
+        <div class="find-describe">
+            <h3>8. Find in the Text</h3>
+            <form id="findDescribeForm">
+                <p>1. A place where Tom sleeps. <input type="text" name="q1"></p>
+                <p>2. A place where the family watches TV. <input type="text" name="q2"></p>
+                <p>3. Something in the garden that grows. <input type="text" name="q3"></p>
+                <p>4. A colour of Tom’s bedroom. <input type="text" name="q4"></p>
+                <p>5. Something in the backyard you can sit on. <input type="text" name="q5"></p>
+                <p>6. A place where the car is kept. <input type="text" name="q6"></p>
+                <button type="button" onclick="checkFindDescribe()">Check Answers</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Drag and Drop Functionality for Exercise 2
+        let dragged;
+
+        document.querySelectorAll('.drag-word').forEach(word => {
+            word.addEventListener('dragstart', (e) => {
+                dragged = e.target;
+                e.dataTransfer.setData('text/plain', e.target.textContent);
+                e.target.classList.add('dragging');
+            });
+            word.addEventListener('dragend', () => {
+                word.classList.remove('dragging');
+            });
+        });
+
+        document.querySelectorAll('.drop-area').forEach(area => {
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('hover');
+            });
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('hover');
+            });
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('hover');
+                if (!area.querySelector('.drag-word')) {
+                    const clone = dragged.cloneNode(true);
+                    clone.addEventListener('dragstart', (e) => {
+                        dragged = e.target;
+                        e.dataTransfer.setData('text/plain', e.target.textContent);
+                        e.target.classList.add('dragging');
+                    });
+                    clone.addEventListener('dragend', () => {
+                        clone.classList.remove('dragging');
+                    });
+                    area.appendChild(clone);
+                    dragged.remove();
+                }
+            });
+        });
+
+        // Tooltip for Words
+        document.querySelectorAll('sup').forEach(sup => {
+            sup.addEventListener('mouseover', (e) => {
+                const tooltip = document.createElement('span');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = e.target.title;
+                tooltip.style.top = `${e.target.offsetTop + 20}px`;
+                tooltip.style.left = `${e.target.offsetLeft}px`;
+                document.body.appendChild(tooltip);
+            });
+            sup.addEventListener('mouseout', () => {
+                document.querySelector('.tooltip')?.remove();
+            });
+        });
+
+        // True or False Radio Selection
+        document.querySelectorAll('.answer-radio').forEach(radio => {
+            radio.addEventListener('click', (e) => {
+                const parent = e.target.parentElement;
+                parent.querySelectorAll('.answer-radio').forEach(r => r.classList.remove('selected'));
+                e.target.classList.add('selected');
+            });
+        });
+
+        // Check True or False
+        function checkTrueFalse() {
+            const answers = {
+                q1: 'false',
+                q2: 'true',
+                q3: 'false',
+                q4: 'false',
+                q5: 'true',
+                q6: 'false'
+            };
+            const form = document.getElementById('trueFalseForm');
+            Object.keys(answers).forEach(key => {
+                const buttons = form.querySelector(`.answer-buttons[data-id=${key}]`);
+                const selectedRadio = buttons.querySelector('.answer-radio.selected');
+                buttons.querySelectorAll('.answer-radio').forEach(r => {
+                    r.classList.remove('correct', 'incorrect');
+                });
+                if (selectedRadio && selectedRadio.dataset.value === answers[key]) {
+                    selectedRadio.classList.add('correct');
+                } else if (selectedRadio) {
+                    selectedRadio.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Matching
+        function checkMatching() {
+            document.querySelectorAll('.drop-area').forEach(area => {
+                const word = area.querySelector('.drag-word');
+                area.classList.remove('correct', 'incorrect');
+                if (word && word.dataset.answer === area.dataset.id) {
+                    area.classList.add('correct');
+                } else if (word) {
+                    area.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Fill in the Blanks
+        function checkFillBlanks() {
+            const answers = {
+                q1: 'There is',
+                q2: 'There are',
+                q3: 'There are',
+                q4: 'There is',
+                q5: 'There is',
+                q6: 'There is'
+            };
+            const form = document.getElementById('fillBlanksForm');
+            Object.keys(answers).forEach(key => {
+                const input = form.querySelector(`[name=${key}]`);
+                input.classList.remove('correct', 'incorrect');
+                if (input.value.trim().toLowerCase() === answers[key].toLowerCase()) {
+                    input.classList.add('correct');
+                } else if (input.value) {
+                    input.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Multiple Choice
+        function checkMultipleChoice() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'a',
+                q4: 'b',
+                q5: 'b',
+                q6: 'b'
+            };
+            const form = document.getElementById('multipleChoiceForm');
+            Object.keys(answers).forEach(key => {
+                const select = form.querySelector(`[name=${key}]`);
+                select.classList.remove('correct', 'incorrect');
+                if (select.value === answers[key]) {
+                    select.classList.add('correct');
+                } else if (select.value) {
+                    select.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Prepositions
+        function checkPrepositions() {
+            const answers = {
+                q1: 'in front of',
+                q2: 'in',
+                q3: 'on',
+                q4: 'at',
+                q5: 'by',
+                q6: 'in'
+            };
+            const form = document.getElementById('prepositionsForm');
+            Object.keys(answers).forEach(key => {
+                const input = form.querySelector(`[name=${key}]`);
+                input.classList.remove('correct', 'incorrect');
+                if (input.value.trim().toLowerCase() === answers[key].toLowerCase()) {
+                    input.classList.add('correct');
+                } else if (input.value) {
+                    input.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Make a Sentence
+        function checkSentences() {
+            const answers = {
+                s1: 'Tom lives in a star house.',
+                s2: 'The garden has bright flowers.',
+                s3: 'There is a big sofa in the living room.',
+                s4: 'Tom’s bedroom is blue.',
+                s5: 'Tom’s mum cooks in the kitchen.',
+                s6: 'There is a crescent moon swing in the backyard.'
+            };
+            const form = document.getElementById('makeSentenceForm');
+            Object.keys(answers).forEach(key => {
+                const input = form.querySelector(`[name=${key}]`);
+                input.classList.remove('correct', 'incorrect');
+                if (input.value.trim().toLowerCase() === answers[key].toLowerCase()) {
+                    input.classList.add('correct');
+                } else if (input.value) {
+                    input.classList.add('incorrect');
+                }
+            });
+        }
+
+        // Check Open Answers (requires teacher review)
+        function checkOpenAnswers() {
+            alert('Please ask your teacher to check these answers!');
+        }
+
+        // Check Find and Describe
+        function checkFindDescribe() {
+            const answers = {
+                q1: 'bedroom',
+                q2: 'living room',
+                q3: 'flowers',
+                q4: 'blue',
+                q5: 'swing',
+                q6: 'garage'
+            };
+            const form = document.getElementById('findDescribeForm');
+            Object.keys(answers).forEach(key => {
+                const input = form.querySelector(`[name=${key}]`);
+                input.classList.remove('correct', 'incorrect');
+                if (input.value.trim().toLowerCase() === answers[key].toLowerCase()) {
+                    input.classList.add('correct');
+                } else if (input.value) {
+                    input.classList.add('incorrect');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
