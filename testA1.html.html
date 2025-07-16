@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Грамматический тест по английскому языку</title>
+    <!-- Подключение Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Установка шрифта Inter для всего документа */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Светло-серый фон для страницы */
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Выравнивание по верху */
+            min-height: 100vh; /* Минимальная высота для центрирования по вертикали */
+        }
+        /* Стиль для заголовков заданий */
+        .task-heading {
+            color: #8A2BE2; /* Фиолетовый цвет для заголовков заданий */
+        }
+        /* Стиль для блоков заданий */
+        .task-block {
+            background-color: #ffffff; /* Белый фон для каждого блока */
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px; /* Закругленные углы */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень */
+            display: none; /* Скрываем все блоки по умолчанию */
+            width: 100%; /* Занимает всю доступную ширину контейнера */
+        }
+        .task-block.active {
+            display: block; /* Показываем активный блок */
+        }
+        /* Стиль для полей ввода */
+        input[type="text"] {
+            border: 1px solid #d1d5db; /* Светлая серая рамка */
+            border-radius: 6px; /* Закругленные углы */
+            padding: 8px 12px;
+            margin-left: 10px;
+            outline: none; /* Убрать обводку при фокусе */
+            transition: border-color 0.2s;
+        }
+        /* Стили для подсветки правильных/неправильных ответов */
+        input.correct {
+            border-color: #10B981; /* Зеленый для правильных */
+            background-color: #D1FAE5; /* Очень светлый зеленый фон */
+        }
+        input.wrong {
+            border-color: #EF4444; /* Красный для неправильных */
+            background-color: #FEE2E2; /* Очень светлый красный фон */
+        }
+        /* Стиль для нумерованных списков */
+        ol {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .check-slide-btn {
+            background-color: #6366f1; /* Синий цвет для кнопки проверки слайда */
+            color: white;
+            font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105;
+            margin-top: 15px;
+            display: block; /* Кнопка на всю ширину блока */
+            width: fit-content; /* Ширина по содержимому */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        .check-slide-btn:hover {
+            background-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+    <div class="max-w-3xl w-full">
+        <h1 class="text-4xl font-bold text-center mb-8 text-[#1e90ff]">Грамматический тест по английскому языку (Уровень A1 - Beginner, Elementary)</h1>
+
+        <p class="text-lg text-gray-700 mb-8 text-center">
+            <strong>Инструкция:</strong> Выберите правильный вариант, вставьте пропущенные слова или преобразуйте предложения согласно заданию.
+        </p>
+
+        <div id="quizContainer">
+            <!-- Задание 1: Глагол "to be" (Present Simple) -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 1: Глагол "to be" (Present Simple)</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте правильную форму глагола "to be" (am, is, are).</strong></p>
+                <ol>
+                    <li>She <input type="text" id="q1_1" class="w-24"> a student.</li>
+                    <li>They <input type="text" id="q1_2" class="w-24"> happy.</li>
+                    <li>I <input type="text" id="text-input q1_3" class="w-24"> from Russia.</li>
+                    <li>He <input type="text" id="q1_4" class="w-24"> a doctor.</li>
+                    <li>We <input type="text" id="q1_5" class="w-24"> friends.</li>
+                    <li>It <input type="text" id="q1_6" class="w-24"> cold today.</li>
+                    <li>You <input type="text" id="q1_7" class="w-24"> tall.</li>
+                    <li>My cat <input type="text" id="q1_8" class="w-24"> black.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 2: Артикли a/an, the -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 2: Артикли a/an, the</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте правильный артикль (a, an, the) или пропустите, если артикль не нужен.</strong></p>
+                <ol>
+                    <li>I have <input type="text" id="q2_1" class="w-24"> apple.</li>
+                    <li>She is <input type="text" id="q2_2" class="w-24"> teacher.</li>
+                    <li><input type="text" id="q2_3" class="w-24"> sun is shining.</li>
+                    <li>He lives in <input type="text" id="q2_4" class="w-24"> big house.</li>
+                    <li>Can you pass me <input type="text" id="q2_5" class="w-24"> salt?</li>
+                    <li>This is <input type="text" id="q2_6" class="w-24"> interesting book.</li>
+                    <li>I like to play <input type="text" id="q2_7" class="w-24"> piano.</li>
+                    <li>They went to <input type="text" id="q2_8" class="w-24"> school yesterday.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 3: There is/are -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 3: There is/are</h3>
+                <p class="text-gray-800 mb-4"><strong>Выберите правильный вариант (There is / There are).</strong></p>
+                <ol>
+                    <li><input type="text" id="q3_1" class="w-48"> a book on the table.</li>
+                    <li><input type="text" id="q3_2" class="w-48"> three cats in the garden.</li>
+                    <li><input type="text" id="q3_3" class="w-48"> no milk in the fridge.</li>
+                    <li><input type="text" id="q3_4" class="w-48"> many people at the party.</li>
+                    <li><input type="text" id="q3_5" class="w-48"> a car outside.</li>
+                    <li><input type="text" id="q3_6" class="w-48"> two pencils in my bag.</li>
+                    <li><input type="text" id="q3_7" class="w-48"> an apple in the basket.</li>
+                    <li><input type="text" id="q3_8" class="w-48"> a lot of water in the bottle.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 4: Порядок слов в предложении -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 4: Порядок слов в предложении</h3>
+                <p class="text-gray-800 mb-4"><strong>Расставьте слова в правильном порядке, чтобы получилось предложение.</strong></p>
+                <ol>
+                    <li>(likes / she / coffee) <input type="text" id="q4_1" class="w-96"></li>
+                    <li>(play / they / football / often) <input type="text" id="q4_2" class="w-96"></li>
+                    <li>(is / a / good / it / idea) <input type="text" id="q4_3" class="w-96"></li>
+                    <li>(speak / English / I / well) <input type="text" id="q4_4" class="w-96"></li>
+                    <li>(at / works / he / office / the) <input type="text" id="q4_5" class="w-96"></li>
+                    <li>(dog / my / is / big) <input type="text" id="q4_6" class="w-96"></li>
+                    <li>(always / early / get up / I) <input type="text" id="q4_7" class="w-96"></li>
+                    <li>(new / they / a / have / car) <input type="text" id="q4_8" class="w-96"></li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 5: Вопросы с what, where, when, why, how, how much (many) -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 5: Вопросы с what, where, when, why, how, how much (many)</h3>
+                <p class="text-gray-800 mb-4"><strong>Составьте вопросы к выделенным словам, используя what, where, when, why, how, how much/many.</strong></p>
+                <ol>
+                    <li>She is <strong>a doctor</strong>. <input type="text" id="q5_1" class="w-96"></li>
+                    <li>They live <strong>in London</strong>. <input type="text" id="q5_2" class="w-96"></li>
+                    <li>He goes to work <strong>by bus</strong>. <input type="text" id="q5_3" class="w-96"></li>
+                    <li>I have <strong>two brothers</strong>. <input type="text" id="q5_4" class="w-96"></li>
+                    <li>She bought <strong>a new dress</strong>. <input type="text" id="q5_5" class="w-96"></li>
+                    <li>They went to bed <strong>at 10 PM</strong>. <input type="text" id="q5_6" class="w-96"></li>
+                    <li>He is crying <strong>because he is sad</strong>. <input type="text" id="q5_7" class="w-96"></li>
+                    <li>There is <strong>a lot of sugar</strong> in the tea. <input type="text" id="q5_8" class="w-96"></li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 6: Единственное и множественное число существительных -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 6: Единственное и множественное число существительных</h3>
+                <p class="text-gray-800 mb-4"><strong>Напишите существительные во множественном числе.</strong></p>
+                <ol>
+                    <li>book - <input type="text" id="q6_1" class="w-48"></li>
+                    <li>box - <input type="text" id="q6_2" class="w-48"></li>
+                    <li>city - <input type="text" id="q6_3" class="w-48"></li>
+                    <li>child - <input type="text" id="q6_4" class="w-48"></li>
+                    <li>potato - <input type="text" id="q6_5" class="w-48"></li>
+                    <li>man - <input type="text" id="q6_6" class="w-48"></li>
+                    <li>tooth - <input type="text" id="q6_7" class="w-48"></li>
+                    <li>bus - <input type="text" id="q6_8" class="w-48"></li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 7: Модальный глагол can/can't -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 7: Модальный глагол can/can't</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте can или can't.</strong></p>
+                <ol>
+                    <li>Birds <input type="text" id="q7_1" class="w-48"> fly.</li>
+                    <li>I <input type="text" id="q7_2a" class="w-48"> speak French, but I <input type="text" id="q7_2b" class="w-48"> speak English.</li>
+                    <li>Fish <input type="text" id="q7_3" class="w-48"> swim.</li>
+                    <li>He <input type="text" id="q7_4" class="w-48"> play the guitar very well.</li>
+                    <li>We <input type="text" id="q7_5" class="w-48"> come to the party tonight. We are busy.</li>
+                    <li><input type="text" id="q7_6" class="w-48"> you help me, please?</li>
+                    <li>Babies <input type="text" id="q7_7" class="w-48"> walk when they are born.</li>
+                    <li>She <input type="text" id="q7_8" class="w-48"> sing beautifully.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 8: Личные местоимения I, we, you, they, he, she, it -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 8: Личные местоимения I, we, you, they, he, she, it</h3>
+                <p class="text-gray-800 mb-4"><strong>Замените выделенные слова на личные местоимения.</strong></p>
+                <ol>
+                    <li><strong>John</strong> is happy. <input type="text" id="q8_1" class="w-24"></li>
+                    <li><strong>My sister and I</strong> are friends. <input type="text" id="q8_2" class="w-24"></li>
+                    <li><strong>The dog</strong> is barking. <input type="text" id="q8_3" class="w-24"></li>
+                    <li><strong>The books</strong> are on the shelf. <input type="text" id="q8_4" class="w-24"></li>
+                    <li><strong>Sarah</strong> is reading. <input type="text" id="q8_5" class="w-24"></li>
+                    <li><strong>Tom and Mike</strong> are playing. <input type="text" id="q8_6" class="w-24"></li>
+                    <li><strong>The car</strong> is red. <input type="text" id="q8_7" class="w-24"></li>
+                    <li><strong>You and I</strong> are students. <input type="text" id="q8_8" class="w-24"></li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 9: Неопределенные местоимения some/any -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 9: Неопределенные местоимения some/any</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте some или any.</strong></p>
+                <ol>
+                    <li>I have <input type="text" id="q9_1" class="w-48"> money.</li>
+                    <li>Do you have <input type="text" id="q9_2" class="w-48"> questions?</li>
+                    <li>There isn't <input type="text" id="q9_3" class="w-48"> milk in the fridge.</li>
+                    <li>Would you like <input type="text" id="q9_4" class="w-48"> tea?</li>
+                    <li>I need <input type="text" id="q9_5" class="w-48"> help.</li>
+                    <li>Are there <input type="text" id="q9_6" class="w-48"> apples left?</li>
+                    <li>She doesn't have <input type="text" id="q9_7" class="w-48"> friends here.</li>
+                    <li>We saw <input type="text" id="q9_8" class="w-48"> interesting animals at the zoo.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 10: Указательные местоимения this/that/these/those -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 10: Указательные местоимения this/that/these/those</h3>
+                <p class="text-gray-800 mb-4"><strong>Выберите правильное указательное местоимение (this, that, these, those).</strong></p>
+                <ol>
+                    <li><input type="text" id="q10_1" class="w-48"> is my pen (близко).</li>
+                    <li><input type="text" id="q10_2" class="w-48"> are my shoes (близко).</li>
+                    <li><input type="text" id="q10_3" class="w-48"> is her house (далеко).</li>
+                    <li><input type="text" id="q10_4" class="w-48"> are their cars (далеко).</li>
+                    <li>Look at <input type="text" id="q10_5" class="w-48"> bird (далеко).</li>
+                    <li><input type="text" id="q10_6" class="w-48"> flowers are beautiful (близко).</li>
+                    <li>Who is <input type="text" id="q10_7" class="w-48"> man over there? (далеко)</li>
+                    <li><input type="text" id="q10_8" class="w-48"> is a good idea (близко).</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 11: Притяжательные местоимения my, our, your, his, her, its, their -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 11: Притяжательные местоимения my, our, your, his, her, its, their</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте правильное притяжательное местоимение.</strong></p>
+                <ol>
+                    <li>I have a cat. <input type="text" id="q11_1" class="w-48"> name is Whiskers.</li>
+                    <li>She has a brother. <input type="text" id="q11_2" class="w-48"> name is Tom.</li>
+                    <li>We live in London. <input type="text" id="q11_3" class="w-48"> house is big.</li>
+                    <li>He has a car. <input type="text" id="q11_4" class="w-48"> car is red.</li>
+                    <li>They have children. <input type="text" id="q11_5" class="w-48"> children are at school.</li>
+                    <li>You have a book. Is <input type="text" id="q11_6" class="w-48"> book interesting?</li>
+                    <li>The dog wagged <input type="text" id="q11_7" class="w-48"> tail.</li>
+                    <li>I have a pen. This is <input type="text" id="q11_8" class="w-48"> pen.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 12: Времена глаголов -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 12: Времена глаголов</h3>
+                <p class="text-gray-800 mb-4"><strong>Поставь глагол в нужную временную форму.</strong></p>
+                <ol>
+                    <li>He <input type="text" id="q12_1" class="w-48"> (go) to work every day.</li>
+                    <li>She <input type="text" id="q12_2" class="w-48"> (read) a book now.</li>
+                    <li>They <input type="text" id="q12_3" class="w-48"> (visit) their grandparents last week.</li>
+                    <li>I <input type="text" id="q12_4" class="w-48"> (travel) to Paris next year.</li>
+                    <li>We <input type="text" id="q12_5" class="w-48"> (always / eat) breakfast together.</li>
+                    <li>Listen! The birds <input type="text" id="q12_6" class="w-48"> (sing).</li>
+                    <li>He <input type="text" id="q12_7" class="w-48"> (never / drink) coffee.</li>
+                    <li>Yesterday, I <input type="text" id="q12_8" class="w-48"> (see) a movie.</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <!-- Задание 13: Наречия частотности (always, often, never) -->
+            <div class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 task-heading">Задание 13: Наречия частотности (always, often, never)</h3>
+                <p class="text-gray-800 mb-4"><strong>Вставьте наречие частотности (always, often, never) в правильное место в предложении.</strong></p>
+                <ol>
+                    <li>She <input type="text" id="q13_1a" class="w-24"> goes <input type="text" id="q13_1b" class="w-24"> to bed late. (often)</li>
+                    <li>I <input type="text" id="q13_2a" class="w-24"> eat <input type="text" id="q13_2b" class="w-24"> breakfast. (always)</li>
+                    <li>They <input type="text" id="q13_3a" class="w-24"> play <input type="text" id="q13_3b" class="w-24"> football on Sundays. (never)</li>
+                    <li>He <input type="text" id="q13_4a" class="w-24"> is <input type="text" id="q13_4b" class="w-24"> happy. (always)</li>
+                    <li>We <input type="text" id="q13_5a" class="w-24"> watch <input type="text" id="q13_5b" class="w-24"> TV in the evening. (often)</li>
+                    <li>She <input type="text" id="q13_6a" class="w-24"> is <input type="text" id="q13_6b" class="w-24"> late for work. (never)</li>
+                    <li>They <input type="text" id="q13_7a" class="w-24"> visit <input type="text" id="q13_7b" class="w-24"> their friends. (often)</li>
+                    <li>The sun <input type="text" id="q13_8a" class="w-24"> shines <input type="text" id="q13_8b" class="w-24"> in summer. (always)</li>
+                </ol>
+                <button onclick="checkAnswersForSlide(this.closest('.task-block'))" class="check-slide-btn">Проверить ответы на этом слайде</button>
+            </div>
+
+            <div id="results" class="task-block">
+                <h3 class="text-2xl font-semibold mb-4 text-center text-gray-800">Ваши результаты</h3>
+                <p id="scoreDisplay" class="text-xl text-center font-bold mb-2"></p>
+                <p id="levelDisplay" class="text-lg text-center text-gray-700"></p>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-8 w-full px-4">
+            <button id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Предыдущее
+            </button>
+            <span id="slideCounter" class="text-lg font-semibold text-gray-700"></span>
+            <button id="nextBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Следующее
+            </button>
+            <button id="finalCheckBtn" onclick="checkAllAnswersAndShowResults()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 hidden">
+                Показать итоговый результат
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Объект с правильными ответами. Все ответы приводятся к нижнему регистру для сравнения без учета регистра.
+        const correctAnswers = {
+            // Задание 1: Глагол "to be" (Present Simple)
+            q1_1: 'is', q1_2: 'are', q1_3: 'am', q1_4: 'is', q1_5: 'are', q1_6: 'is', q1_7: 'are', q1_8: 'is',
+            // Задание 2: Артикли a/an, the
+            q2_1: 'an', q2_2: 'a', q2_3: 'the', q2_4: 'a', q2_5: 'the', q2_6: 'an', q2_7: 'the', q2_8: '', // Пустая строка для отсутствия артикля
+            // Задание 3: There is/are
+            q3_1: 'there is', q3_2: 'there are', q3_3: ['there isn\'t', 'there is no'], q3_4: 'there are', q3_5: 'there is', q3_6: 'there are', q3_7: 'there is', q3_8: 'there is',
+            // Задание 4: Порядок слов в предложении
+            q4_1: 'she likes coffee',
+            q4_2: 'they often play football',
+            q4_3: 'it is a good idea',
+            q4_4: 'i speak english well',
+            q4_5: 'he works at the office',
+            q4_6: 'my dog is big',
+            q4_7: 'i always get up early',
+            q4_8: 'they have a new car',
+            // Задание 5: Вопросы с what, where, when, why, how, how much (many)
+            q5_1: 'what is she',
+            q5_2: 'where do they live',
+            q5_3: 'how does he go to work',
+            q5_4: 'how many brothers do you have',
+            q5_5: 'what did she buy',
+            q5_6: 'when did they go to bed',
+            q5_7: 'why is he crying',
+            q5_8: 'how much sugar is there in the tea',
+            // Задание 6: Единственное и множественное число существительных
+            q6_1: 'books', q6_2: 'boxes', q6_3: 'cities', q6_4: 'children', q6_5: 'potatoes', q6_6: 'men', q6_7: 'teeth', q6_8: 'buses',
+            // Задание 7: Модальный глагол can/can't
+            q7_1: 'can', q7_2a: 'can\'t', q7_2b: 'can', q7_3: 'can', q7_4: 'can', q7_5: 'can\'t', q7_6: 'can', q7_7: 'can\'t', q7_8: 'can',
+            // Задание 8: Личные местоимения I, we, you, they, he, she, it
+            q8_1: 'he', q8_2: 'we', q8_3: 'it', q8_4: 'they', q8_5: 'she', q8_6: 'they', q8_7: 'it', q8_8: 'we',
+            // Задание 9: Неопределенные местоимения some/any
+            q9_1: 'some', q9_2: 'any', q9_3: 'any', q9_4: 'some', q9_5: 'some', q9_6: 'any', q9_7: 'any', q9_8: 'some',
+            // Задание 10: Указательные местоимения this/that/these/those
+            q10_1: 'this', q10_2: 'these', q10_3: 'that', q10_4: 'those', q10_5: 'that', q10_6: 'these', q10_7: 'that', q10_8: 'this',
+            // Задание 11: Притяжательные местоимения my, our, your, his, her, its, their
+            q11_1: 'its', q11_2: 'his', q11_3: 'our', q11_4: 'his', q11_5: 'their', q11_6: 'your', q11_7: 'its', q11_8: 'my',
+            // Задание 12: Времена глаголов
+            q12_1: 'goes', q12_2: 'is reading', q12_3: 'visited', q12_4: 'will travel', q12_5: 'always eat', q12_6: 'are singing', q12_7: 'never drinks', q12_8: 'saw',
+            // Задание 13: Наречия частотности (always, often, never) - скорректированные ответы
+            q13_1a: 'often', q13_1b: '', // She often goes to bed late.
+            q13_2a: 'always', q13_2b: '', // I always eat breakfast.
+            q13_3a: 'never', q13_3b: '', // They never play football on Sundays.
+            q13_4a: '', q13_4b: 'always', // He is always happy. (after 'is')
+            q13_5a: 'often', q13_5b: '', // We often watch TV in the evening.
+            q13_6a: '', q13_6b: 'never', // She is never late for work. (after 'is')
+            q13_7a: 'often', q13_7b: '', // They often visit their friends.
+            q13_8a: 'always', q13_8b: '' // The sun always shines in summer.
+        };
+
+        let currentSlideIndex = 0;
+        let slides = [];
+        let prevBtn, nextBtn, finalCheckBtn, slideCounter; // Переименована checkBtn в finalCheckBtn
+        let resultsDiv;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            slides = document.querySelectorAll('.task-block');
+            prevBtn = document.getElementById('prevBtn');
+            nextBtn = document.getElementById('nextBtn');
+            finalCheckBtn = document.getElementById('finalCheckBtn'); // Получаем новую кнопку
+            slideCounter = document.getElementById('slideCounter');
+            resultsDiv = document.getElementById('results');
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    showSlide(currentSlideIndex);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlideIndex < slides.length - 1) {
+                    currentSlideIndex++;
+                    showSlide(currentSlideIndex);
+                }
+            });
+
+            // Изначально показываем первый слайд
+            showSlide(currentSlideIndex);
+        });
+
+        function showSlide(index) {
+            // Скрываем все слайды
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (slide.id === 'results') {
+                    slide.classList.add('hidden');
+                }
+            });
+
+            // Показываем текущий слайд
+            slides[index].classList.add('active');
+            if (slides[index].id === 'results') {
+                slides[index].classList.remove('hidden');
+            }
+
+            // Обновляем счетчик слайдов
+            slideCounter.textContent = `${index + 1} из ${slides.length}`;
+
+            // Управляем видимостью кнопок навигации
+            prevBtn.classList.toggle('hidden', index === 0);
+            nextBtn.classList.toggle('hidden', index === slides.length - 1); // Скрываем, когда на слайде результатов
+
+            // Управляем видимостью кнопки "Показать итоговый результат"
+            finalCheckBtn.classList.toggle('hidden', index !== slides.length - 2); // Показываем только на последнем задании перед результатами
+        }
+
+        // Функция для проверки ответов на текущем слайде
+        function checkAnswersForSlide(slideElement) {
+            const inputs = slideElement.querySelectorAll('input[type="text"]');
+            inputs.forEach(inputElement => {
+                const id = inputElement.id;
+                // Пропускаем, если это не поле, которое мы отслеживаем
+                if (!correctAnswers.hasOwnProperty(id)) {
+                    return;
+                }
+
+                inputElement.classList.remove('correct', 'wrong');
+
+                const userAnswer = inputElement.value.trim().toLowerCase();
+                const correctAnswer = correctAnswers[id];
+
+                let isCorrect = false;
+                if (Array.isArray(correctAnswer)) {
+                    isCorrect = correctAnswer.includes(userAnswer);
+                } else {
+                    isCorrect = (userAnswer === correctAnswer.toLowerCase());
+                }
+
+                if (isCorrect) {
+                    inputElement.classList.add('correct');
+                } else {
+                    inputElement.classList.add('wrong');
+                }
+            });
+        }
+
+        // Функция для проверки всех ответов и отображения итогового результата
+        function checkAllAnswersAndShowResults() {
+            let correctCount = 0;
+            const totalQuestions = Object.keys(correctAnswers).length;
+
+            for (const id in correctAnswers) {
+                const inputElement = document.getElementById(id);
+                if (inputElement) {
+                    inputElement.classList.remove('correct', 'wrong');
+
+                    const userAnswer = inputElement.value.trim().toLowerCase();
+                    const correctAnswer = correctAnswers[id];
+
+                    let isCorrect = false;
+                    if (Array.isArray(correctAnswer)) {
+                        isCorrect = correctAnswer.includes(userAnswer);
+                    } else {
+                        isCorrect = (userAnswer === correctAnswer.toLowerCase());
+                    }
+
+                    if (isCorrect) {
+                        inputElement.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        inputElement.classList.add('wrong');
+                    }
+                }
+            }
+
+            // Отображение результатов
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const levelDisplay = document.getElementById('levelDisplay');
+
+            const percentage = (correctCount / totalQuestions) * 100;
+            let level = '';
+
+            if (percentage >= 90) {
+                level = 'Отличный результат! Уровень A1+';
+                scoreDisplay.classList.remove('text-red-600', 'text-yellow-600');
+                scoreDisplay.classList.add('text-green-600');
+            } else if (percentage >= 70) {
+                level = 'Хороший результат! Уровень A1';
+                scoreDisplay.classList.remove('text-red-600', 'text-green-600');
+                scoreDisplay.classList.add('text-yellow-600');
+            } else {
+                level = 'Требуется больше практики. Уровень A1-';
+                scoreDisplay.classList.remove('text-green-600', 'text-yellow-600');
+                scoreDisplay.classList.add('text-red-600');
+            }
+
+            scoreDisplay.textContent = `Вы набрали ${correctCount} из ${totalQuestions} (${percentage.toFixed(2)}%)`;
+            levelDisplay.textContent = level;
+
+            // Переходим к слайду с результатами
+            currentSlideIndex = slides.length - 1;
+            showSlide(currentSlideIndex);
+        }
+    </script>
+</body>
+</html>
