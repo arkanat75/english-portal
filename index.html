@@ -1,9 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>English Portal</title>
+    <title>Мой учебный портал</title>
+    <style>
+        body {
+            background-color: #001a33; /* Тёмно-синий фон */
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Чтобы звёзды не выходили за границы */
+        }
+        h1 {
+            color: #ffcc00; /* Жёлтый цвет */
+            text-shadow: 0 0 10px #ffcc00; /* Свечение */
+            margin-top: 50px;
+        }
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        .menu a {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #6e45e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .menu a:hover {
+            background: #5a35cc;
+            transform: scale(1.05);
+        }
+        /* Мерцающие звёзды */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Мой сайт работает!</h1>
+    <!-- Заголовок -->
+    <h1>Мой учебный портал</h1>
+    
+    <!-- Меню -->
+    <div class="menu">
+        <a href="starhouse.html">Star House</a>
+        <a href="testA1.html">Тест A1</a>
+        <a href="#">Ещё задание (позже добавим)</a>
+    </div>
+
+    <!-- Скрипт для звёзд -->
+    <script>
+        // Создаём 50 мерцающих звёзд
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            star.style.width = `${Math.random() * 3 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            document.body.appendChild(star);
+        }
+    </script>
 </body>
 </html>
