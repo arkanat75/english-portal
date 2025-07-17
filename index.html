@@ -24,7 +24,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 40px;
+            gap: 20px;
             padding: 40px;
             max-width: 1200px;
         }
@@ -32,33 +32,32 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 320px;
-            padding: 25px;
+            width: 280px;
+            padding: 20px;
             text-align: center;
             transition: transform 0.3s;
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .card img {
+            width: 100%;
+            border-radius: 8px;
+            height: 160px;
+            object-fit: cover;
         }
         .btn {
             display: inline-block;
             background: #4e54c8;
             color: white;
-            padding: 12px 25px;
+            padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
-            margin-top: 20px;
-            transition: all 0.3s;
-            font-size: 16px;
+            margin-top: 15px;
+            transition: background 0.3s;
         }
         .btn:hover {
             background: #4348a8;
-            transform: scale(1.05);
-        }
-        h1 {
-            color: #4e54c8;
-            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -70,22 +69,22 @@
 
     <div class="container">
         <div class="card">
-            <h2>Star House</h2>
-            <p>Увлекательный рассказ для практики</p>
-            <a href="starhouse.html" class="btn">Читать →</a>
+            <h3>Тест с ответами</h3>
+            <p>Проверьте свои знания</p>
+            <a href="testA1.html" class="btn">Открыть</a>
         </div>
 
         <div class="card">
-            <h2>Тест A1</h2>
-            <p>Проверьте свои знания</p>
-            <a href="testA1.html" class="btn">Пройти тест →</a>
+            <h3>Star House</h3>
+            <p>Увлекательный рассказ</p>
+            <a href="starhouse.html" class="btn">Читать</a>
         </div>
 
         <!-- Новая карточка для игры -->
         <div class="card">
-            <h2>Card Game</h2>
+            <h3>Card Game</h3>
             <p>Игра для 2 класса</p>
-            <a href="card-game.html" class="btn">Играть →</a>
+            <a href="card-game.html" class="btn">Играть</a>
         </div>
     </div>
 </body>
