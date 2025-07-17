@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Card Game: Open the Cards</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение Font Awesome для иконок (кубик) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Основные стили для фона и шрифтов */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Равномерный пудровый оттенок фона */
+            background-color: #F8E8EE; /* Светлый, пудровый розовый оттенок */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Скрыть прокрутку */
+            color: #333;
+        }
+
+        /* Контейнер игры */
+        .game-container {
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 90%;
+            width: 700px; /* Фиксированная ширина для настольной версии */
+        }
+
+        /* Игровое поле */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 колонки для 20 клеток */
+            gap: 8px; /* Увеличенный зазор между клетками */
+            width: 100%;
+            max-width: 500px; /* Максимальная ширина поля */
+            border: 5px solid #8A2BE2; /* Сине-фиолетовая рамка */
+            border-radius: 15px;
+            padding: 8px;
+            background-color: #e6e6fa; /* Лавандовый фон поля */
+        }
+
+        /* Клетка игрового поля (изначально яркие темные) */
+        .square {
+            width: 100px; /* Фиксированный размер клетки */
+            height: 100px;
+            background-color: #4A148C; /* Темно-фиолетовый */
+            border: 2px solid #6A1B9A; /* Чуть светлее рамка */
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5em; /* Увеличенный размер шрифта */
+            position: relative;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: white; /* Белый текст на темном фоне */
+        }
+
+        .square:hover:not(.opened) { /* Только если клетка не открыта */
+            transform: scale(1.05); /* Увеличение при наведении */
+            background-color: #6A1B9A; /* Изменение цвета при наведении */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Стиль для открытых (использованных) клеток (светлее) */
+        .square.opened {
+            background-color: #E1BEE7; /* Светло-фиолетовый */
+            border-color: #9C27B0; /* Средне-фиолетовая рамка */
+            color: #4A148C; /* Темно-фиолетовый текст */
+            cursor: default; /* Нет указателя мыши */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15); /* Внутренняя тень */
+            opacity: 0.9; /* Чуть прозрачнее */
+            pointer-events: none; /* Отключить события мыши для открытых клеток */
+        }
+
+        .square.opened:hover {
+            transform: none; /* Нет трансформации при наведении */
+            background-color: #E1BEE7; /* Сохранить цвет открытой клетки */
+        }
+
+        /* Панель управления */
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Кнопка генерации числа */
+        .generate-number-button {
+            background: linear-gradient(45deg, #FF69B4 0%, #FF00FF 100%); /* Фуксия градиент */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .generate-number-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .generate-number-button:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .generate-number-button:disabled {
+            background: linear-gradient(45deg, #cccccc 0%, #aaaaaa 100%); /* Серый для отключенной кнопки */
+            cursor: not-allowed;
+        }
+
+        /* Отображение сгенерированного числа */
+        .generated-number-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #FF00FF; /* Фуксия */
+            width: 70px; /* Увеличенный размер */
+            height: 70px;
+            border: 3px solid #FF00FF;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffe0f0; /* Светло-розовый */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Модальное окно для вопросов */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center; /* Центрируем содержимое модального окна */
+            max-width: 500px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-question {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            color: #3f51b5; /* Синий цвет для вопроса */
+            font-weight: bold;
+        }
+
+        .modal-button {
+            background: linear-gradient(45deg, #3f51b5 0%, #673AB7 100%); /* Сине-фиолетовый градиент */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: inline-block; /* Убедимся, что это блочный элемент для margin:auto */
+            margin: 0 auto; /* Центрируем кнопку */
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Сообщение о текущем состоянии игры */
+        .game-status-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #673AB7; /* Фиолетовый цвет */
+        }
+
+        /* Контейнер для фейерверков */
+        .fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Чтобы не блокировать взаимодействие с игрой */
+            z-index: 2000;
+        }
+
+        /* Стиль для отдельного фейерверка */
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: transparent;
+            border-radius: 50%;
+            opacity: 0;
+            animation: firework-burst 1s ease-out forwards;
+        }
+
+        /* Анимация фейерверка */
+        @keyframes firework-burst {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+                box-shadow: 0 0 0 0px currentColor;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+                box-shadow: 0 0 50px 10px currentColor;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+                box-shadow: 0 0 100px 20px transparent;
+            }
+        }
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 15px;
+                width: 95%;
+            }
+            .board {
+                grid-template-columns: repeat(3, 1fr); /* Меньше колонок на маленьких экранах */
+                max-width: 400px;
+            }
+            .square {
+                width: 80px;
+                height: 80px;
+                font-size: 1.2em;
+            }
+            .generate-number-button {
+                padding: 10px 20px;
+                font-size: 1.2em;
+            }
+            .generated-number-display {
+                width: 60px;
+                height: 60px;
+                font-size: 2.2em;
+            }
+            .modal-question {
+                font-size: 1.4em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .board {
+                grid-template-columns: repeat(2, 1fr); /* Еще меньше колонок */
+                max-width: 250px;
+            }
+            .square {
+                width: 100px;
+                height: 100px;
+                font-size: 1.5em;
+            }
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-status-display" id="gameStatusDisplay">
+            Click the button to generate a number!
+        </div>
+        <div class="board" id="gameBoard">
+            <!-- Squares will be generated by JavaScript -->
+        </div>
+        <div class="controls">
+            <button class="generate-number-button" id="generateNumberButton">
+                <i class="fas fa-dice"></i> Generate Number!
+            </button>
+            <div class="generated-number-display" id="generatedNumberDisplay">
+                <!-- The number will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal window for questions -->
+    <div class="modal" id="questionModal">
+        <div class="modal-content">
+            <p class="modal-question" id="modalQuestionText"></p>
+            <button class="modal-button" id="closeModalButton">DONE</button>
+        </div>
+    </div>
+
+    <!-- Container for fireworks -->
+    <div class="fireworks-container" id="fireworksContainer"></div>
+
+    <script>
+        // DOM elements
+        const gameBoard = document.getElementById('gameBoard');
+        const generateNumberButton = document.getElementById('generateNumberButton');
+        const generatedNumberDisplay = document.getElementById('generatedNumberDisplay');
+        const questionModal = document.getElementById('questionModal');
+        const modalQuestionText = document.getElementById('modalQuestionText');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const gameStatusDisplay = document.getElementById('gameStatusDisplay');
+        const fireworksContainer = document.getElementById('fireworksContainer');
+
+        // Game parameters
+        const boardSize = 20; // Total number of squares on the board
+        let generatedNumber = 0; // The generated number to find
+        let openedSquaresCount = 0; // Number of opened (used) squares
+        let isWaitingForClick = false; // Flag: are we waiting for the user to click a square?
+        let availableNumbers = []; // Array to store numbers that haven't been picked yet
+
+        // List of questions/tasks for children (20 unique questions)
+        const questions = [
+            "Name 5 colours",
+            "Name 5 letters",
+            "Name the members of your family",
+            "Do you like chicken?",
+            "Name 5 words beginning with b",
+            "Name 5 animals",
+            "What toys have you got?",
+            "Is your family big?",
+            "Draw a fish",
+            "What's your favourite food?",
+            "Name 3 rooms in the house",
+            "What have you got in the schoolbag?",
+            "How old are you?",
+            "Can you swim?",
+            "What's your name?",
+            "Do you like vegetables?",
+            "Count from 5 to 10",
+            "Have you got green eyes?",
+            "Where are you from?",
+            "Name 3 drinks"
+        ];
+
+        /**
+         * Initializes the game board, creates squares, and resets game state.
+         */
+        function initializeGame() {
+            gameBoard.innerHTML = ''; // Clear the board
+            openedSquaresCount = 0;
+            generatedNumber = 0;
+            isWaitingForClick = false;
+            gameStatusDisplay.textContent = `Click the button to generate a number!`;
+            generateNumberButton.disabled = false;
+            generatedNumberDisplay.textContent = ''; // Clear the number display
+            fireworksContainer.innerHTML = ''; // Clear fireworks
+
+            // Populate availableNumbers with all numbers from 1 to boardSize
+            availableNumbers = Array.from({ length: boardSize }, (_, i) => i + 1);
+
+            // Shuffle the questions so they appear in a random order each time
+            const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+
+            // Create game board squares
+            const numColumns = 4; // Number of columns for 20 squares (4x5)
+            for (let i = 0; i < boardSize; i++) {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                square.dataset.index = i; // Square index (0-19)
+                square.textContent = i + 1; // Displayed square number (1-20)
+
+                // Assign a question to this square from the shuffled list
+                square.dataset.question = shuffledQuestions[i]; // Each square gets a unique question
+
+                // Set the order to form a "snake" pattern
+                const row = Math.floor(i / numColumns);
+                if (row % 2 === 0) { // Even rows (0, 2, 4...) go left to right
+                    square.style.order = i + 1;
+                } else { // Odd rows (1, 3...) go right to left
+                    const startOfRowIndex = row * numColumns;
+                    const positionInRow = i % numColumns;
+                    square.style.order = startOfRowIndex + (numColumns - positionInRow);
+                }
+
+                // Add click handler to each square
+                square.addEventListener('click', handleSquareClick);
+
+                gameBoard.appendChild(square);
+            }
+        }
+
+        /**
+         * Generates a random number from the available (unpicked) numbers and updates game status.
+         */
+        async function generateNumber() {
+            // If already waiting for a square click, ignore repeated calls
+            if (isWaitingForClick) return;
+
+            // If no numbers are available, all cards are opened, game should be over
+            if (availableNumbers.length === 0) {
+                gameStatusDisplay.textContent = `All cards opened! Congratulations! Click 'Start Over' to play again.`;
+                generateNumberButton.disabled = true;
+                return;
+            }
+
+            generateNumberButton.disabled = true; // Disable button while waiting for square click
+            isWaitingForClick = true; // Set waiting flag
+
+            // Pick a random index from the available numbers
+            const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+            const newNumber = availableNumbers[randomIndex]; // Get the number
+            generatedNumber = newNumber;
+
+            // Remove the picked number from the available list
+            availableNumbers.splice(randomIndex, 1);
+
+            // "Dice roll" animation
+            for (let i = 0; i < 10; i++) {
+                // Show a random number from the *remaining* available numbers for animation effect
+                const tempIndex = Math.floor(Math.random() * availableNumbers.length);
+                generatedNumberDisplay.textContent = availableNumbers[tempIndex] || (Math.floor(Math.random() * boardSize) + 1); // Fallback if availableNumbers is empty during animation
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+
+            generatedNumberDisplay.textContent = generatedNumber; // Show final number
+            gameStatusDisplay.textContent = `Click on square number ${generatedNumber}!`; // Instruction for the user
+        }
+
+        /**
+         * Click handler for game board squares.
+         * @param {Event} event Click event.
+         */
+        function handleSquareClick(event) {
+            const clickedSquare = event.target;
+            const squareNumber = parseInt(clickedSquare.textContent); // Get the displayed square number
+
+            // If not waiting for a square click, or square is already opened, or it's not the correct square, ignore
+            if (!isWaitingForClick) {
+                gameStatusDisplay.textContent = `First, generate a number!`;
+                return;
+            }
+            // The `availableNumbers` logic already ensures `generatedNumber` is for an unopened card.
+            // This check is mostly for user feedback if they click the wrong card.
+            if (squareNumber !== generatedNumber) {
+                gameStatusDisplay.textContent = `Wrong square! Click on square number ${generatedNumber}.`;
+                return;
+            }
+
+            // If the click is on the correct and unopened square
+            clickedSquare.classList.add('opened'); // Add "opened" class
+            openedSquaresCount++; // Increment count of opened squares
+            isWaitingForClick = false; // Reset waiting flag
+
+            // Show the question associated with this square
+            showQuestion(clickedSquare.dataset.question);
+        }
+
+        /**
+         * Shows the question in the modal window.
+         * @param {string} questionText Text of the question to display.
+         */
+        function showQuestion(questionText) {
+            modalQuestionText.textContent = questionText;
+            questionModal.classList.add('active'); // Activate modal window
+        }
+
+        /**
+         * Closes the modal window and checks if all squares are opened.
+         */
+        function closeQuestionModal() {
+            questionModal.classList.remove('active'); // Deactivate modal window
+            closeModalButton.style.display = 'block'; // Ensure "DONE" button is visible for next time
+
+            if (openedSquaresCount === boardSize) {
+                // If all squares are opened, game is over
+                showWinMessage();
+                triggerFireworks(); // Launch fireworks
+                generateNumberButton.disabled = true; // Disable number generation button
+            } else {
+                // If game continues, enable the button for generating a new number
+                generateNumberButton.disabled = false;
+                gameStatusDisplay.textContent = `Click the button to generate a number!`;
+            }
+        }
+
+        /**
+         * Shows the game completion/win message.
+         */
+        function showWinMessage() {
+            gameStatusDisplay.textContent = `All cards opened! Congratulations!`;
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Start Over';
+            restartButton.classList.add('modal-button', 'mt-4'); // Tailwind classes for button styling
+            restartButton.onclick = () => {
+                initializeGame(); // Restart the game
+                questionModal.classList.remove('active'); // Close modal if it's open
+                closeModalButton.style.display = 'block'; // Ensure "DONE" button is visible
+            };
+
+            modalQuestionText.textContent = `All cards opened! Congratulations!`;
+            modalQuestionText.appendChild(restartButton); // Add "Start Over" button to the modal
+            questionModal.classList.add('active'); // Show modal with win message
+            closeModalButton.style.display = 'none'; // Hide standard modal close button
+        }
+
+        /**
+         * Triggers the fireworks animation.
+         */
+        function triggerFireworks() {
+            fireworksContainer.innerHTML = ''; // Clear previous fireworks
+            // Firework colors matching the new palette
+            const colors = ['#8A2BE2', '#FF00FF', '#00BFFF', '#FFD700', '#FF1493', '#00FFFF'];
+
+            for (let i = 0; i < 40; i++) { // Create 40 fireworks for a grand display
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.classList.add('firework');
+                    firework.style.left = `${Math.random() * 100}vw`;
+                    firework.style.top = `${Math.random() * 100}vh`;
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    firework.style.color = firework.style.backgroundColor; // For box-shadow
+                    fireworksContainer.appendChild(firework);
+
+                    // Remove firework after animation completes
+                    firework.addEventListener('animationend', () => {
+                        firework.remove();
+                    });
+                }, i * 70); // Launch fireworks with a small delay
+            }
+        }
+
+        // Event handlers
+        generateNumberButton.addEventListener('click', generateNumber);
+        closeModalButton.addEventListener('click', closeQuestionModal);
+
+        // Initialize game on page load
+        window.onload = initializeGame;
+
+    </script>
+</body>
+</html>
