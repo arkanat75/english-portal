@@ -1,91 +1,227 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой учебный портал</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        :root {
+            --primary: #6e45e2;
+            --secondary: #88d3ce;
+            --accent: #ff9a9e;
+        }
+        
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: white;
+            padding: 20px;
         }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
         .header {
-            background: rgba(255,255,255,0.9);
-            width: 100%;
-            padding: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
+            margin: 30px 0;
+            padding: 20px;
         }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255,154,158,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
         .container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            padding: 40px;
+            gap: 30px;
             max-width: 1200px;
+            margin: 0 auto;
         }
+        
         .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 280px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 300px;
             text-align: center;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
+        
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px) rotateZ(2deg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
-        .card img {
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            border-radius: 8px;
-            height: 160px;
-            object-fit: cover;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
         }
+        
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .card p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+            min-height: 40px;
+        }
+        
         .btn {
             display: inline-block;
-            background: #4e54c8;
+            padding: 12px 30px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
             text-decoration: none;
-            margin-top: 15px;
-            transition: background 0.3s;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(110, 69, 226, 0.4);
         }
+        
         .btn:hover {
-            background: #4348a8;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(110, 69, 226, 0.6);
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+            opacity: 0;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .card {
+                width: 90%;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+    
     <div class="header">
-        <h1>✨ Мой учебный портал</h1>
-        <p>Выберите материал для изучения</p>
+        <h1>Мой учебный портал</h1>
+        <p class="subtitle">Выберите материал для изучения</p>
     </div>
-
+    
     <div class="container">
-        <div class="card">
-            <h3>Тест с ответами</h3>
-            <p>Проверьте свои знания</p>
-            <a href="testA1.html" class="btn">Открыть</a>
+        <div class="card" onclick="location.href='testA1.html'">
+            <div class="card-icon">🧠</div>
+            <h3>Английский тест</h3>
+            <p>Проверьте свои знания в увлекательной форме</p>
+            <div class="btn">Пройти тест</div>
         </div>
-
-        <div class="card">
+        
+        <div class="card" onclick="location.href='starhouse.html'">
+            <div class="card-icon">🏠</div>
             <h3>Star House</h3>
-            <p>Увлекательный рассказ</p>
-            <a href="starhouse.html" class="btn">Читать</a>
+            <p>Увлекательный рассказ на английском</p>
+            <div class="btn">Читать</div>
         </div>
-
-        <!-- Новая карточка для игры -->
-        <div class="card">
+        
+        <!-- НОВАЯ КАРТОЧКА ДЛЯ ИГРЫ -->
+        <div class="card" onclick="location.href='card-game.html'">
+            <div class="card-icon">🎮</div>
             <h3>Card Game</h3>
             <p>Игра для 2 класса</p>
-            <a href="card-game.html" class="btn">Играть</a>
+            <div class="btn">Играть</div>
         </div>
     </div>
+    
+    <script>
+        // Создаем звездный фон
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = `${Math.random() * 3 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            starsContainer.appendChild(star);
+        }
+        
+        // Анимация при наведении на карточки
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) rotateZ(2deg)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) rotateZ(0)';
+            });
+        });
+    </script>
 </body>
 </html>
