@@ -93,7 +93,7 @@
                 <ol>
                     <li>She <input type="text" id="q1_1" class="w-24"> a student.</li>
                     <li>They <input type="text" id="q1_2" class="w-24"> happy.</li>
-                    <li>I <input type="text" id="text-input q1_3" class="w-24"> from Russia.</li>
+                    <li>I <input type="text" id="q1_3" class="w-24"> from Russia.</li>
                     <li>He <input type="text" id="q1_4" class="w-24"> a doctor.</li>
                     <li>We <input type="text" id="q1_5" class="w-24"> friends.</li>
                     <li>It <input type="text" id="q1_6" class="w-24"> cold today.</li>
@@ -382,14 +382,14 @@
 
         let currentSlideIndex = 0;
         let slides = [];
-        let prevBtn, nextBtn, finalCheckBtn, slideCounter; // Переименована checkBtn в finalCheckBtn
+        let prevBtn, nextBtn, finalCheckBtn, slideCounter;
         let resultsDiv;
 
         document.addEventListener('DOMContentLoaded', () => {
             slides = document.querySelectorAll('.task-block');
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
-            finalCheckBtn = document.getElementById('finalCheckBtn'); // Получаем новую кнопку
+            finalCheckBtn = document.getElementById('finalCheckBtn');
             slideCounter = document.getElementById('slideCounter');
             resultsDiv = document.getElementById('results');
 
@@ -407,12 +407,10 @@
                 }
             });
 
-            // Изначально показываем первый слайд
             showSlide(currentSlideIndex);
         });
 
         function showSlide(index) {
-            // Скрываем все слайды
             slides.forEach((slide, i) => {
                 slide.classList.remove('active');
                 if (slide.id === 'results') {
@@ -420,21 +418,18 @@
                 }
             });
 
-            // Показываем текущий слайд
             slides[index].classList.add('active');
             if (slides[index].id === 'results') {
                 slides[index].classList.remove('hidden');
             }
 
-            // Обновляем счетчик слайдов
             slideCounter.textContent = `${index + 1} из ${slides.length}`;
 
-            // Управляем видимостью кнопок навигации
             prevBtn.classList.toggle('hidden', index === 0);
-            nextBtn.classList.toggle('hidden', index === slides.length - 1); // Скрываем, когда на слайде результатов
+            nextBtn.classList.toggle('hidden', index === slides.length - 1);
 
-            // Управляем видимостью кнопки "Показать итоговый результат"
-            finalCheckBtn.classList.toggle('hidden', index !== slides.length - 2); // Показываем только на последнем задании перед результатами
+            // Кнопка "Показать итоговый результат" появляется только на последнем задании перед блоком результатов
+            finalCheckBtn.classList.toggle('hidden', index !== slides.length - 2);
         }
 
         // Функция для проверки ответов на текущем слайде
@@ -442,7 +437,6 @@
             const inputs = slideElement.querySelectorAll('input[type="text"]');
             inputs.forEach(inputElement => {
                 const id = inputElement.id;
-                // Пропускаем, если это не поле, которое мы отслеживаем
                 if (!correctAnswers.hasOwnProperty(id)) {
                     return;
                 }
@@ -472,10 +466,11 @@
             let correctCount = 0;
             const totalQuestions = Object.keys(correctAnswers).length;
 
+            // Проверяем все ответы на всех слайдах
             for (const id in correctAnswers) {
                 const inputElement = document.getElementById(id);
                 if (inputElement) {
-                    inputElement.classList.remove('correct', 'wrong');
+                    inputElement.classList.remove('correct', 'wrong'); // Сброс подсветки
 
                     const userAnswer = inputElement.value.trim().toLowerCase();
                     const correctAnswer = correctAnswers[id];
@@ -488,11 +483,9 @@
                     }
 
                     if (isCorrect) {
-                        inputElement.classList.add('correct');
                         correctCount++;
-                    } else {
-                        inputElement.classList.add('wrong');
                     }
+                    // Не подсвечиваем здесь, так как подсветка уже сделана на каждом слайде
                 }
             }
 
