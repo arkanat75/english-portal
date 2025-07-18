@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name the Colour Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the game */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ADD8E6; /* Light Blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative; /* Needed for absolute positioning of canvas */
+            overflow: hidden; /* Hide overflow from fireworks */
+        }
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 900px; /* Increased max-width for a more horizontal layout */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            position: relative; /* Needed for z-index relative to fireworks */
+            z-index: 5; /* Ensure game content is above fireworks */
+        }
+        .color-circle {
+            width: 70px; /* Smaller size */
+            height: 70px; /* Smaller size */
+            border-radius: 50%; /* Make it a circle */
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 2px solid transparent; /* Default border */
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .color-circle:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .color-circle.selected {
+            border-color: #3b82f6; /* Blue border when selected */
+        }
+        .feedback-icon {
+            font-size: 3rem; /* Large icon size */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            margin-left: 1rem; /* Space from the word */
+            line-height: 1; /* Adjust line height to align better */
+        }
+        .feedback-icon.show {
+            opacity: 1;
+        }
+        .feedback-icon.correct {
+            color: #22c55e; /* Green for correct */
+        }
+        .feedback-icon.wrong {
+            color: #ef4444; /* Red for wrong */
+        }
+        #colorWordContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem; /* Space between word and feedback icon */
+            min-height: 4rem; /* Ensure enough space for word and icon */
+        }
+        #colorWord {
+            color: #000000;
+            font-weight: bold;
+            font-size: 3.5rem; /* Adjusted font size for better fit */
+            text-align: center;
+        }
+        #colorOptions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center items horizontally */
+            gap: 1rem; /* Space between circles */
+            width: 100%;
+            max-width: 380px; /* Max width to ensure 4 circles fit per row (70*4 + 16*3 = 328px, so 380px gives some buffer) */
+            margin: 0 auto; /* Center the flex container itself */
+        }
+        /* Styles for disabled clicks */
+        .color-options-disabled {
+            pointer-events: none;
+            opacity: 0.7; /* Visually indicate disabled state */
+        }
+        .button-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Colorful Title Styling */
+        #gameTitle {
+            background-image: linear-gradient(to right, #FF3333, #3366FF, #FFFF33, #33CC33, #9933FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent; /* Fallback for browsers that don't support text-fill-color */
+            font-size: 4rem;
+            font-weight: extrabold;
+            margin-bottom: 1rem;
+        }
+
+        /* Fireworks Canvas Styling */
+        #fireworksCanvas {
+            position: fixed; /* Use fixed to cover the entire viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks to pass through */
+            z-index: 10; /* Ensure it's on top */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.5s ease-in-out;
+        }
+        #fireworksCanvas.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 id="gameTitle">Name the colour</h1>
+
+        <div class="flex justify-between w-full text-lg font-medium text-gray-700">
+            <div>Correct: <span id="correctScore">0</span></div>
+            <div>Wrong: <span id="wrongScore">0</span></div>
+            <div>Time: <span id="timer">0:00</span></div>
+        </div>
+
+        <div class="flex gap-4">
+            <button id="startButton" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                Start Game
+            </button>
+            <button id="stopButton" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-xl shadow-lg hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105 button-disabled" disabled>
+                Stop Game
+            </button>
+            <button id="backButton" class="px-8 py-3 bg-gray-600 text-white font-semibold rounded-xl shadow-lg hover:bg-gray-700 transition duration-300 ease-in-out transform hover:scale-105">
+                Back to Start
+            </button>
+        </div>
+
+        <div id="gameArea" class="w-full flex flex-col items-center gap-6 mt-6">
+            <div id="colorWordContainer">
+                <div id="colorWord" class="text-5xl font-bold"></div>
+                <div id="feedback" class="feedback-icon"></div>
+            </div>
+            <div id="colorOptions">
+                <!-- Color circles will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Fireworks Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <script>
+        // Array of colors to be used in the game with slightly adjusted hex codes for brightness
+        const colors = [
+            { name: 'red', hex: '#FF3333' },    // Brighter red
+            { name: 'blue', hex: '#3366FF' },   // Brighter blue
+            { name: 'yellow', hex: '#FFFF33' }, // Brighter yellow
+            { name: 'green', hex: '#33CC33' },  // Brighter green
+            { name: 'grey', hex: '#A0A0A0' },   // Slightly lighter grey
+            { name: 'white', hex: '#FFFFFF' },
+            { name: 'black', hex: '#000000' },
+            { name: 'brown', hex: '#A0522D' },  // More natural brown (Sienna)
+            { name: 'pink', hex: '#FF99CC' },   // Brighter pink
+            { name: 'purple', hex: '#9933FF' }, // Brighter purple
+            { name: 'orange', hex: '#FF9933' }  // Brighter orange
+        ];
+
+        // Game state variables
+        let correctScore = 0;
+        let wrongScore = 0;
+        let timerInterval;
+        let startTime;
+        let pausedTime = 0; // To store elapsed time when paused
+        let currentCorrectColor = null; // Stores the name of the correct color for the current round
+        let gamePaused = true; // Initially paused/not started
+        let usedColors = []; // Array to keep track of colors already presented in the current game
+        let currentLevel = 1; // Current game level (1 or 2)
+
+        // DOM elements
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const backButton = document.getElementById('backButton'); // New back button
+        const gameArea = document.getElementById('gameArea');
+        const colorWordDisplay = document.getElementById('colorWord');
+        const colorOptionsContainer = document.getElementById('colorOptions');
+        const correctScoreDisplay = document.getElementById('correctScore');
+        const wrongScoreDisplay = document.getElementById('wrongScore');
+        const timerDisplay = document.getElementById('timer');
+        const feedbackIcon = document.getElementById('feedback');
+
+        // Fireworks Canvas elements
+        const fireworksCanvas = document.getElementById('fireworksCanvas');
+        const ctx = fireworksCanvas.getContext('2d');
+        let particles = [];
+        let animationFrameId = null;
+
+        /**
+         * Shuffles an array randomly.
+         * @param {Array} array - The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * Selects a random color for the text display in Level 2,
+         * ensuring it's not the correct color and not black or white.
+         * @param {string} correctColorName - The name of the correct color for the current round.
+         * @returns {string} Hex code of a random color for text display.
+         */
+        function getRandomDisplayColor(correctColorName) {
+            const nonConflictingColors = colors.filter(c => 
+                c.name !== correctColorName && 
+                c.name !== 'black' && 
+                c.name !== 'white' &&
+                c.name !== 'grey' // Also exclude grey for better contrast
+            );
+            if (nonConflictingColors.length > 0) {
+                return nonConflictingColors[Math.floor(Math.random() * nonConflictingColors.length)].hex;
+            }
+            // Fallback if only conflicting colors are left (should not happen with 11 colors)
+            return '#FF00FF'; // Magenta as a distinct fallback
+        }
+
+        /**
+         * Starts a new level or resets the current level's state.
+         */
+        function startLevel() {
+            correctScore = 0;
+            wrongScore = 0;
+            correctScoreDisplay.textContent = correctScore;
+            wrongScoreDisplay.textContent = wrongScore;
+            timerDisplay.textContent = '0:00';
+            startTime = Date.now();
+            pausedTime = 0;
+            usedColors = []; // Reset used colors for the new level
+
+            colorOptionsContainer.classList.remove('color-options-disabled');
+            colorOptionsContainer.style.pointerEvents = 'auto';
+
+            clearInterval(timerInterval); // Clear any old timer
+            timerInterval = setInterval(updateTimer, 1000);
+            nextRound(); // Start the first round of this level
+        }
+
+        /**
+         * Handles starting a new game or resuming an existing one.
+         */
+        function handleStartResume() {
+            if (gamePaused) { // Only proceed if game is currently paused or not started
+                gamePaused = false;
+                startButton.classList.add('hidden'); // Hide Start/Resume button
+                stopButton.classList.remove('hidden', 'button-disabled'); // Show and enable Stop button
+                stopButton.disabled = false;
+
+                // Hide fireworks if they were showing
+                fireworksCanvas.classList.remove('show');
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+                particles = [];
+                ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+
+                if (startButton.textContent === 'Start Game' || startButton.textContent === 'Start New Game') {
+                    // Starting Level 1 or a completely new game after Level 2 completion
+                    currentLevel = 1;
+                    startLevel();
+                } else if (startButton.textContent === 'Start Level 2') {
+                    // Starting Level 2
+                    currentLevel = 2;
+                    startLevel();
+                } else if (startButton.textContent === 'Resume Game') {
+                    // Resuming a paused game within the same level
+                    startTime = Date.now() - pausedTime; // Corrected from Date.2now()
+                    timerInterval = setInterval(updateTimer, 1000);
+                    colorOptionsContainer.classList.remove('color-options-disabled');
+                    colorOptionsContainer.style.pointerEvents = 'auto';
+                }
+            }
+        }
+
+        /**
+         * Stops/pauses the game.
+         */
+        function stopGame() {
+            clearInterval(timerInterval); // Stop the timer
+            pausedTime = Date.now() - startTime; // Store elapsed time
+            gamePaused = true; // Set game to paused state
+
+            stopButton.classList.add('hidden'); // Hide Stop button
+            stopButton.disabled = true; // Disable it
+
+            startButton.classList.remove('hidden'); // Show Start button
+            startButton.textContent = 'Resume Game'; // Change text to Resume
+
+            // Disable clicks on color options
+            colorOptionsContainer.classList.add('color-options-disabled');
+            colorOptionsContainer.style.pointerEvents = 'none';
+        }
+
+        /**
+         * Sets up a brand new game (full reset of scores and timer).
+         * This function is called initially and can be used for a full restart.
+         */
+        function resetGame() {
+            correctScore = 0;
+            wrongScore = 0;
+            correctScoreDisplay.textContent = correctScore;
+            wrongScoreDisplay.textContent = wrongScore;
+            timerDisplay.textContent = '0:00';
+            startTime = undefined; // Reset start time
+            pausedTime = 0; // Reset paused time
+            gamePaused = true; // Set to paused so handleStartResume can start it fresh
+            usedColors = []; // Reset the list of used colors for a new game
+            currentLevel = 1; // Always start at Level 1 for a full reset
+            
+            startButton.textContent = 'Start Game'; // Reset button text
+            startButton.classList.remove('hidden'); // Ensure start button is visible
+            
+            stopButton.classList.remove('hidden'); // Ensure stop button is visible
+            stopButton.classList.add('button-disabled'); // Add disabled style
+            stopButton.disabled = true; // Disable stop button initially
+
+            clearInterval(timerInterval); // Clear any running timer
+
+            // Display initial empty word and render all color circles (disabled)
+            colorWordDisplay.textContent = ''; // Empty text initially
+            colorWordDisplay.style.color = '#000000'; // Ensure black text for initial state
+            renderColorOptions(colors); // Render all colors initially
+            colorOptionsContainer.classList.add('color-options-disabled'); // Disable clicks initially
+            colorOptionsContainer.style.pointerEvents = 'none'; // Ensure pointer events are disabled
+            feedbackIcon.classList.remove('show', 'correct', 'wrong'); // Hide feedback icon
+
+            // Clear any active fireworks
+            fireworksCanvas.classList.remove('show');
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            particles = [];
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+        }
+
+        /**
+         * Updates the timer display.
+         */
+        function updateTimer() {
+            const elapsedTime = Date.now() - startTime;
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        /**
+         * Renders the color options (circles) in the container.
+         * @param {Array} options - An array of color objects to render.
+         */
+        function renderColorOptions(options) {
+            colorOptionsContainer.innerHTML = ''; // Clear previous options
+            options.forEach(color => {
+                const colorCircle = document.createElement('div');
+                colorCircle.classList.add('color-circle');
+                colorCircle.style.backgroundColor = color.hex;
+                colorCircle.dataset.colorName = color.name; // Store color name for checking
+                
+                // Add a border for white and black colors to make them visible against background/text
+                if (color.name === 'white') {
+                    colorCircle.style.border = '2px solid #ccc';
+                } else if (color.name === 'black') {
+                    colorCircle.style.border = '2px solid #eee';
+                }
+
+                colorCircle.addEventListener('click', () => checkAnswer(color.name));
+                colorOptionsContainer.appendChild(colorCircle);
+            });
+        }
+
+        /**
+         * Sets up the next round of the game.
+         * Selects a new color word and generates color options.
+         */
+        function nextRound() {
+            // Hide feedback icon from previous round
+            feedbackIcon.classList.remove('show', 'correct', 'wrong');
+
+            // Check if all colors have been used in the current level
+            if (usedColors.length === colors.length) {
+                clearInterval(timerInterval);
+                colorOptionsContainer.classList.add('color-options-disabled');
+                colorOptionsContainer.style.pointerEvents = 'none';
+                stopButton.classList.add('hidden');
+                stopButton.disabled = true;
+                startButton.classList.remove('hidden');
+                gamePaused = true;
+
+                if (currentLevel === 1) {
+                    colorWordDisplay.textContent = `Level 1 Complete! Your score: ${correctScore}/${colors.length}. Time: ${timerDisplay.textContent}`;
+                    startButton.textContent = 'Start Level 2';
+                    // usedColors will be reset by startLevel() when 'Start Level 2' is clicked
+                } else { // currentLevel === 2
+                    colorWordDisplay.textContent = `Game Over! Your score: ${correctScore}/${colors.length}. Time: ${timerDisplay.textContent}`;
+                    startButton.textContent = 'Start New Game';
+                    // currentLevel will be reset to 1 by handleStartResume when 'Start New Game' is clicked
+                    // usedColors will be reset by startLevel()
+                    
+                    // Trigger fireworks!
+                    fireworksCanvas.classList.add('show');
+                    createFireworksBurst(fireworksCanvas.width / 2, fireworksCanvas.height / 2); // Center burst
+                    animateFireworks(); // Start animation loop
+                    setTimeout(() => {
+                        fireworksCanvas.classList.remove('show'); // Hide fireworks after a delay
+                        if (animationFrameId) {
+                            cancelAnimationFrame(animationFrameId);
+                            animationFrameId = null;
+                        }
+                        particles = [];
+                        ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+                    }, 5000); // Fireworks last for 5 seconds
+                }
+                return; // End the game for the current level
+            }
+
+            // Select a random color that hasn't been used yet
+            let availableColors = colors.filter(color => !usedColors.includes(color.name));
+            const randomIndex = Math.floor(Math.random() * availableColors.length);
+            currentCorrectColor = availableColors[randomIndex];
+            usedColors.push(currentCorrectColor.name); // Add to used colors
+
+            // Display word based on current level
+            if (currentLevel === 1) {
+                colorWordDisplay.style.color = '#000000'; // Black text for Level 1
+                colorWordDisplay.textContent = `${currentCorrectColor.name.toUpperCase()}`;
+            } else { // Level 2
+                const randomDisplayColorHex = getRandomDisplayColor(currentCorrectColor.name);
+                colorWordDisplay.style.color = randomDisplayColorHex;
+                colorWordDisplay.textContent = `${currentCorrectColor.name.toUpperCase()}`;
+            }
+
+            // All colors will be options, shuffled (including used ones, but only the word changes)
+            const options = shuffleArray([...colors]); // Create a shuffled copy of all colors
+            renderColorOptions(options); // Render the shuffled colors
+        }
+
+        /**
+         * Checks the user's answer and provides feedback.
+         * @param {string} selectedColorName - The name of the color selected by the user.
+         */
+        function checkAnswer(selectedColorName) {
+            if (gamePaused) return; // Do nothing if game is paused
+
+            // Disable further clicks temporarily
+            colorOptionsContainer.classList.add('color-options-disabled');
+            colorOptionsContainer.style.pointerEvents = 'none';
+
+            if (selectedColorName === currentCorrectColor.name) {
+                correctScore++;
+                correctScoreDisplay.textContent = correctScore;
+                feedbackIcon.textContent = '✔'; // Green checkmark
+                feedbackIcon.classList.add('correct', 'show');
+            } else {
+                wrongScore++;
+                wrongScoreDisplay.textContent = wrongScore;
+                feedbackIcon.textContent = '✖'; // Red cross
+                feedbackIcon.classList.add('wrong', 'show');
+            }
+
+            // Highlight the selected circle (optional, for visual feedback)
+            const selectedCircle = Array.from(colorOptionsContainer.children).find(box => box.dataset.colorName === selectedColorName);
+            if (selectedCircle) {
+                selectedCircle.classList.add('selected');
+            }
+
+            // Wait a moment before moving to the next round
+            setTimeout(() => {
+                colorOptionsContainer.classList.remove('color-options-disabled'); // Re-enable clicks
+                colorOptionsContainer.style.pointerEvents = 'auto'; // Ensure pointer events are re-enabled
+                if (selectedCircle) {
+                    selectedCircle.classList.remove('selected');
+                }
+                nextRound();
+            }, 1000); // 1 second delay
+        }
+
+        // Fireworks Logic
+        // Particle class for fireworks
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1; // Random size
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 10,
+                    y: (Math.random() - 0.5) * 10
+                };
+                this.alpha = 1;
+                this.friction = 0.99;
+                this.gravity = 0.1;
+                this.life = 100; // Frames to live
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01; // Fade out
+                this.life--;
+            }
+        }
+
+        /**
+         * Creates a burst of fireworks particles.
+         * @param {number} x - X coordinate for the burst.
+         * @param {number} y - Y coordinate for the burst.
+         */
+        function createFireworksBurst(x, y) {
+            const particleCount = 50;
+            const hue = Math.random() * 360; // Random hue for vibrant colors
+            for (let i = 0; i < particleCount; i++) {
+                const color = `hsl(${hue}, 100%, 50%)`;
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        /**
+         * Animation loop for fireworks.
+         */
+        function animateFireworks() {
+            animationFrameId = requestAnimationFrame(animateFireworks);
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height); // Clear canvas
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                particle.update();
+                particle.draw();
+
+                if (particle.life <= 0 || particle.alpha <= 0.01) {
+                    particles.splice(i, 1); // Remove dead particles
+                }
+            }
+
+            // Stop animation if no particles left
+            if (particles.length === 0 && animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                fireworksCanvas.classList.remove('show');
+            }
+        }
+
+        // Event listeners for the buttons
+        startButton.addEventListener('click', handleStartResume);
+        stopButton.addEventListener('click', stopGame);
+        backButton.addEventListener('click', resetGame); // Event listener for the new back button
+
+        // Initial setup when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set canvas size to match window
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+
+            // Update canvas size on window resize
+            window.addEventListener('resize', () => {
+                fireworksCanvas.width = window.innerWidth;
+                fireworksCanvas.height = window.innerHeight;
+            });
+
+            resetGame(); // Call resetGame to set initial state
+        });
+    </script>
+</body>
+</html>
