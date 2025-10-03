@@ -600,8 +600,17 @@
     };
   });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // снимаем все выбранные ответы в упражнении 1
+    document.querySelectorAll('#ex1 input[type="radio"]').forEach(el => el.checked = false);
+    // (по желанию) не восстанавливаем старые ответы:
+    // try { localStorage.removeItem('diary-progress'); } catch(e){}
+  });
+</script>
 </body>
 </html>
+
 
 
 
