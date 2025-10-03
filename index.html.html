@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Secret Diary — Interactive Worksheet</title>
+  <style>
+    :root{
+      --cream:#fff7ea; --paper:#fffefb; --ink:#2b2b2b;
+      --accent1:#6c63ff; --accent2:#00b894; --accent3:#ff7675; --accent4:#fbc531; --accent5:#00a8ff;
+      --pastel1:#e8f7ff; --pastel2:#fff0f6; --pastel3:#f4fff4; --pastel4:#fffbea;
+      --ring:#5c5c5c; --success:#20bf6b; --error:#e74c3c;
+    }
+    html,body{height:100%}
+    body{margin:0; background:linear-gradient(160deg,var(--cream),#fff); color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji"; line-height:1.55}
+    .container{max-width:1000px;margin:0 auto;padding:24px}
+    .title{font-size:clamp(28px,5vw,46px);font-weight:900;letter-spacing:.5px;margin:0}
+    .title .c1{color:var(--accent1)} .title .c2{color:var(--accent3)} .title .c4{color:var(--accent2)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 22px}
+    .btn{appearance:none;border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.08);transition:transform .04s ease,box-shadow .2s ease}
+    .btn:active{transform:translateY(1px)} .btn.primary{background:var(--accent1);color:#fff} .btn.outline{background:#fff;border:2px solid #00000010}
+
+    /* Cover */
+    .cover{position:relative; border-radius:26px; padding:18px; background:linear-gradient(135deg,#fffaf0,#f0f7ff); box-shadow:0 16px 36px rgba(0,0,0,.12); margin-bottom:18px}
+    .coverWrap{display:flex; gap:18px; align-items:center;}
+    .coverImg{flex:0 0 220px; height:320px; border-radius:22px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.15); background:#fff}
+    .coverImg img{width:100%; height:100%; object-fit:cover}
+    .coverText{flex:1}
+    .diaryBtn{display:inline-flex; align-items:center; gap:10px; padding:14px 18px; border-radius:18px; background:#fff; border:3px solid #3332; box-shadow:0 10px 22px rgba(0,0,0,.12); font-weight:900; cursor:pointer}
+    .diaryBtn .icon{font-size:22px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    .card{position:relative;background:var(--paper);border-radius:20px;padding:16px 18px 18px 22px;box-shadow:0 10px 24px rgba(0,0,0,.12); display:flex; flex-direction:column; min-height:190px}
+    .card::before{content:"";position:absolute;left:-14px;top:18px;bottom:18px;width:24px;background:linear-gradient(#e9edf3,#f6f7fb);border-radius:12px;box-shadow:inset 0 0 0 2px #00000010}
+    .ring{position:absolute;left:-8px;width:12px;height:12px;background:#cfd6e3;border:2px solid var(--ring);border-radius:50%;box-shadow:0 2px 0 rgba(0,0,0,.1)}
+    .ring.r1{top:30px}.ring.r2{top:90px}.ring.r3{top:150px}.ring.r4{top:210px}
+    .card h3{margin:2px 0 8px;font-size:18px}
+    .card .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.3px}
+    .person{display:flex;align-items:flex-start;gap:24px; margin-top:6px}
+    .avatar{flex:0 0 110px;max-width:110px}
+    .avatar img{width:110px;height:110px;object-fit:contain;border-radius:16px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.08);padding:6px}
+    .text{flex:1}
+
+    section{margin:22px 0}
+    section h2{font-size:24px;margin:0 0 8px}
+    .sec{border-radius:20px;padding:14px;box-shadow:0 8px 22px rgba(0,0,0,.08)}
+    .sec.p1{background:var(--pastel1)} .sec.p2{background:var(--pastel2)} .sec.p3{background:var(--pastel3)} .sec.p4{background:var(--pastel4)}
+
+    .exercise{background:#fff;border-radius:16px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-top:10px; position:relative}
+    .exercise h3{display:flex;align-items:center;gap:8px;margin-top:0}
+    .sticker{position:absolute; right:10px; top:10px; font-size:22px; opacity:.9}
+    .pill{padding:4px 10px;border-radius:999px;background:#00000008;font-size:12px;font-weight:800}
+    .q{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:10px}
+    .q:hover{background:#fafafa}
+    .q .num{font-weight:800;min-width:22px}
+    .q input[type=text]{width:100%;padding:8px 10px;border-radius:10px;border:2px solid #00000012;font-size:15px}
+    .select{padding:8px 10px;border-radius:10px;border:2px solid #00000012;font-size:15px;background:#fff}
+    .choices{display:flex;gap:10px;flex-wrap:wrap}
+
+    /* Word bank chips (now draggable) */
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;background:#f4f6ff;border:2px dashed #a0a7ff;cursor:grab;user-select:none}
+    .chip:active{cursor:grabbing}
+    .chip.used{opacity:.35;text-decoration:line-through}
+    .wordbank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+    .blank{width:220px}
+
+    .feedback{font-weight:700}
+    .ok{color:var(--success)} .bad{color:var(--error)} .score{font-weight:900}
+    .wrong{background:#ffe6e6!important} .right{background:#e6ffe6!important}
+
+    .footer{opacity:.7;font-size:13px;margin:20px 0 60px}
+    .diag{font-size:13px; opacity:.8}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 1) COVER ONLY -->
+    <section class="cover">
+      <div class="coverWrap">
+        <div class="coverImg"><img alt="Cover" src="img/cover.png"></div>
+        <div class="coverText">
+          <h1 class="title" style="margin-bottom:10px"><span class="c1">MY</span> <span class="c2">SECRET</span> <span class="c4">DIARY</span></h1>
+          <p style="margin:8px 0 14px">Interactive reading and practice for young learners. Tap the notebook to begin.</p>
+          <a href="#storySection" class="diaryBtn" aria-label="Click to start">
+            <span class="icon">📔</span>
+            <span>Click to start</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR (kept) -->
+    <div class="toolbar">
+      <button class="btn primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+      <button class="btn outline" id="toggleText">👀 Show / Hide Story</button>
+      <button class="btn outline" id="resetAll">♻️ Reset Progress</button>
+    </div>
+
+    <!-- 2) STORY BLOCK -->
+    <section id="storySection" class="sec p1">
+      <h2>Story</h2>
+      <div class="grid">
+        <!-- Lucy -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Lucy Brown</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Lucy" src="img/lucy.png"></div>
+            <p class="text">Hello! My name is Lucy Brown. I am 11 years old and I want to tell you about my family.</p>
+          </div>
+        </article>
+        <!-- Mum -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Anna</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Mum doctor" src="img/mum.png"></div>
+            <p class="text">She is 36 years old and she is a doctor. She helps sick people every day. In her free time, she likes reading detective books. She is clever and patient.</p>
+          </div>
+        </article>
+        <!-- Dad -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Peter</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Dad bus driver" src="img/dad.png"></div>
+            <p class="text">He is 40 years old and he loves football. He always watches matches on TV and can cook delicious pasta. He is really cool.</p>
+          </div>
+        </article>
+        <!-- Brother -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Jack</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Brother with tablet" src="img/brother.png"></div>
+            <p class="text">He is 9 years old, very funny but sometimes noisy. He plays football in the park and his favourite computer game is Minecraft.</p>
+          </div>
+        </article>
+        <!-- Sister -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Lily</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Sister singing" src="img/sister.png"></div>
+            <p class="text">She is 5 years old. She goes to kindergarten, likes painting colourful pictures and singing songs. She always sings in the car.</p>
+          </div>
+        </article>
+        <!-- Grandpa -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>George</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Grandpa chess" src="img/grandpa.png"></div>
+            <p class="text">He is 74 years old and retired. He used to be a teacher. He likes telling stories about the past and can play chess very well.</p>
+          </div>
+        </article>
+        <!-- Grandma -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Mary</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Grandma rose" src="img/grandma.png"></div>
+            <p class="text">She is 71 years old. She loves gardening — her roses are beautiful! She bakes cakes and never burns them. She is kind and friendly.</p>
+          </div>
+        </article>
+        <!-- Dog -->
+        <article class="card">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+          <h3>Max</h3>
+          <div class="person">
+            <div class="avatar"><img alt="Dog Max" src="img/dog.png"></div>
+            <p class="text">Max is two years old. He is big, brown and very playful. He loves running in the park and playing with a ball.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 3) EXERCISES BLOCKS (1–6) -->
+    <section class="sec p2">
+      <h2>Exercises</h2>
+
+      <!-- 1 TRUE / FALSE -->
+      <div class="exercise" id="ex1">
+        <span class="sticker">✅</span>
+        <h3>1) True or False? <span class="pill">8 items</span></h3>
+        <div class="q"><div class="num">1.</div><div>Lucy is 12 years old.
+          <div class="choices">
+            <label><input type="radio" name="tf1" value="T"> True</label>
+            <label><input type="radio" name="tf1" value="F"> False</label>
+          </div></div></div>
+        <div class="q"><div class="num">2.</div><div>Anna is Lucy’s mother.
+          <div class="choices"><label><input type="radio" name="tf2" value="T"> True</label>
+            <label><input type="radio" name="tf2" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">3.</div><div>Anna works as a doctor.
+          <div class="choices"><label><input type="radio" name="tf3" value="T"> True</label>
+            <label><input type="radio" name="tf3" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">4.</div><div>Peter is 36 years old.
+          <div class="choices"><label><input type="radio" name="tf4" value="T"> True</label>
+            <label><input type="radio" name="tf4" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">5.</div><div>Jack is Lucy’s brother.
+          <div class="choices"><label><input type="radio" name="tf5" value="T"> True</label>
+            <label><input type="radio" name="tf5" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">6.</div><div>Lily is 5 years old.
+          <div class="choices"><label><input type="radio" name="tf6" value="T"> True</label>
+            <label><input type="radio" name="tf6" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">7.</div><div>George used to be a teacher.
+          <div class="choices"><label><input type="radio" name="tf7" value="T"> True</label>
+            <label><input type="radio" name="tf7" value="F"> False</label></div></div></div>
+        <div class="q"><div class="num">8.</div><div>Max is Lucy’s cat.
+          <div class="choices"><label><input type="radio" name="tf8" value="T"> True</label>
+            <label><input type="radio" name="tf8" value="F"> False</label></div></div></div>
+        <button class="btn primary" onclick="checkTF()">Check</button>
+        <span class="feedback" id="tfFeedback"></span>
+      </div>
+
+      <!-- 2 ANSWER THE QUESTIONS -->
+      <div class="exercise" id="ex2">
+        <span class="sticker">❓</span>
+        <h3>2) Answer the questions <span class="pill">short answers</span></h3>
+        <div class="q"><div class="num">1.</div><div>How old is Lucy? <input class="blank" type="text" id="a1"></div></div>
+        <div class="q"><div class="num">2.</div><div>What does Lucy’s mum like reading? <input class="blank" type="text" id="a2"></div></div>
+        <div class="q"><div class="num">3.</div><div>What sport does Peter love? <input class="blank" type="text" id="a3"></div></div>
+        <div class="q"><div class="num">4.</div><div>What game does Jack like? <input class="blank" type="text" id="a4"></div></div>
+        <div class="q"><div class="num">5.</div><div>Where does Lily go? <input class="blank" type="text" id="a5"></div></div>
+        <div class="q"><div class="num">6.</div><div>What can Grandpa George play very well? <input class="blank" type="text" id="a6"></div></div>
+        <div class="q"><div class="num">7.</div><div>What flowers does Grandma Mary grow? <input class="blank" type="text" id="a7"></div></div>
+        <div class="q"><div class="num">8.</div><div>How old is Max? <input class="blank" type="text" id="a8"></div></div>
+        <button class="btn primary" onclick="checkQA()">Check</button>
+        <span class="feedback" id="qaFeedback"></span>
+        <div style="margin-top:8px"><button class="btn outline" onclick="toggleKey('qaKey')">Show answer key</button>
+          <div id="qaKey" style="display:none; margin-top:6px; opacity:.85">1) 11. 2) detective books. 3) football. 4) Minecraft. 5) kindergarten / nursery. 6) chess. 7) roses. 8) two.</div></div>
+      </div>
+
+      <!-- 3 FILL IN THE GAPS with DRAG & DROP -->
+      <div class="exercise" id="ex3">
+        <span class="sticker">🧩</span>
+        <h3>3) Fill in the gaps <span class="pill">drag the words</span></h3>
+        <div class="wordbank" id="bank"></div>
+        <div class="q"><div class="num">1.</div><div>Lucy is <input class="blank dropzone" readonly type="text" id="g1"> years old.</div></div>
+        <div class="q"><div class="num">2.</div><div>Her mum is a <input class="blank dropzone" readonly type="text" id="g2">.</div></div>
+        <div class="q"><div class="num">3.</div><div>Her dad is a <input class="blank dropzone" readonly type="text" id="g3">.</div></div>
+        <div class="q"><div class="num">4.</div><div>Peter loves <input class="blank dropzone" readonly type="text" id="g4">.</div></div>
+        <div class="q"><div class="num">5.</div><div>Jack’s favourite hobby is playing <input class="blank dropzone" readonly type="text" id="g5">.</div></div>
+        <div class="q"><div class="num">6.</div><div>Lily likes <input class="blank dropzone" readonly type="text" id="g6">.</div></div>
+        <div class="q"><div class="num">7.</div><div>George can play <input class="blank dropzone" readonly type="text" id="g7"> very well.</div></div>
+        <div class="q"><div class="num">8.</div><div>Mary grows beautiful <input class="blank dropzone" readonly type="text" id="g8">.</div></div>
+        <button class="btn primary" onclick="checkGaps()">Check</button>
+        <span class="feedback" id="gapFeedback"></span>
+      </div>
+
+      <!-- 4 MATCHING -->
+      <div class="exercise" id="ex4">
+        <span class="sticker">🔗</span>
+        <h3>4) Match the family member with the fact <span class="pill">choose A–H</span></h3>
+        <p style="margin:0 0 6px">Facts: A) She reads detective books. B) He watches football matches. C) He plays Minecraft. D) She sings in the car. E) He used to be a teacher. F) She likes gardening and grows roses. G) He is a big brown dog. H) She is 11 years old.</p>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+          <div class="q"><div class="num">1.</div><div>Anna <select class="select" id="m1"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">2.</div><div>Peter <select class="select" id="m2"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">3.</div><div>Jack <select class="select" id="m3"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">4.</div><div>Lily <select class="select" id="m4"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">5.</div><div>George <select class="select" id="m5"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">6.</div><div>Mary <select class="select" id="m6"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">7.</div><div>Max <select class="select" id="m7"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+          <div class="q"><div class="num">8.</div><div>Lucy <select class="select" id="m8"><option value="">—</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+        </div>
+        <button class="btn primary" onclick="checkMatch()">Check</button>
+        <span class="feedback" id="matchFeedback"></span>
+      </div>
+
+      <!-- 5 CHOOSE THE CORRECT OPTION -->
+      <div class="exercise" id="ex5">
+        <span class="sticker">🎯</span>
+        <h3>5) Choose the correct option <span class="pill">circle one</span></h3>
+        <div class="q"><div class="num">1.</div><div>Lucy is
+          <label><input type="radio" name="mc1" value="11"> 11</label>
+          <label><input type="radio" name="mc1" value="12"> 12</label>
+          <label><input type="radio" name="mc1" value="10"> 10</label>
+        </div></div>
+        <div class="q"><div class="num">2.</div><div>Anna is a
+          <label><input type="radio" name="mc2" value="teacher"> teacher</label>
+          <label><input type="radio" name="mc2" value="doctor"> doctor</label>
+          <label><input type="radio" name="mc2" value="nurse"> nurse</label>
+        </div></div>
+        <div class="q"><div class="num">3.</div><div>Peter is a
+          <label><input type="radio" name="mc3" value="pilot"> pilot</label>
+          <label><input type="radio" name="mc3" value="bus driver"> bus driver</label>
+          <label><input type="radio" name="mc3" value="taxi driver"> taxi driver</label>
+        </div></div>
+        <div class="q"><div class="num">4.</div><div>Jack is
+          <label><input type="radio" name="mc4" value="8"> 8</label>
+          <label><input type="radio" name="mc4" value="9"> 9</label>
+          <label><input type="radio" name="mc4" value="7"> 7</label>
+        </div></div>
+        <div class="q"><div class="num">5.</div><div>Lily is Lucy’s
+          <label><input type="radio" name="mc5" value="sister"> sister</label>
+          <label><input type="radio" name="mc5" value="cousin"> cousin</label>
+          <label><input type="radio" name="mc5" value="friend"> friend</label>
+        </div></div>
+        <div class="q"><div class="num">6.</div><div>George likes playing
+          <label><input type="radio" name="mc6" value="cards"> cards</label>
+          <label><input type="radio" name="mc6" value="chess"> chess</label>
+          <label><input type="radio" name="mc6" value="tennis"> tennis</label>
+        </div></div>
+        <div class="q"><div class="num">7.</div><div>Mary grows
+          <label><input type="radio" name="mc7" value="apples"> apples</label>
+          <label><input type="radio" name="mc7" value="roses"> roses</label>
+          <label><input type="radio" name="mc7" value="tomatoes"> tomatoes</label>
+        </div></div>
+        <div class="q"><div class="num">8.</div><div>Max is a
+          <label><input type="radio" name="mc8" value="cat"> cat</label>
+          <label><input type="radio" name="mc8" value="dog"> dog</label>
+          <label><input type="radio" name="mc8" value="rabbit"> rabbit</label>
+        </div></div>
+        <button class="btn primary" onclick="checkMC()">Check</button>
+        <span class="feedback" id="mcFeedback"></span>
+      </div>
+
+      <!-- 6 WRITING -->
+      <div class="exercise" id="ex6">
+        <span class="sticker">✍️</span>
+        <h3>6) Writing — About you <span class="pill">8 sentences</span></h3>
+        <p>Write about your family. Use the example skeleton below.</p>
+        <textarea id="writing" rows="8" style="width:100%; padding:12px; border-radius:14px; border:2px solid #00000012"></textarea>
+        <div style="display:flex; gap:10px; align-items:center; margin-top:8px">
+          <button class="btn outline" onclick="countSentences()">Count sentences</button>
+          <span id="countOut" class="pill">0 sentences</span>
+          <button class="btn outline" onclick="saveWriting()">Save</button>
+        </div>
+        <details class="diag" style="margin-top:8px"><summary>Diagnostics / Quick tests</summary>
+          <p><button class="btn outline" onclick="runTests()" type="button">Run quick tests</button></p>
+          <div id="testOut" class="diag"></div>
+        </details>
+      </div>
+
+    </section>
+
+    <p class="footer">Made with British English spelling and extra teacher-friendly bits. Tip: Use the Print button to export to PDF.</p>
+  </div>
+
+<script>
+  // Run code after DOM is fully loaded to avoid null element errors
+  document.addEventListener('DOMContentLoaded', () => {
+    // Toggle story visibility
+    const story = document.getElementById('storySection');
+    const toggleBtn = document.getElementById('toggleText');
+    if(toggleBtn && story){
+      toggleBtn.addEventListener('click',()=>{
+        story.style.display = story.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    // Reset
+    const resetBtn = document.getElementById('resetAll');
+    if(resetBtn){
+      resetBtn.addEventListener('click',()=>{
+        localStorage.removeItem('msd-progress');
+        localStorage.removeItem('msd-writing');
+        location.reload();
+      });
+    }
+
+    // 1) TRUE / FALSE
+    window.tfKey = ['F','T','T','F','T','T','T','F'];
+    function getRows(selector){ return Array.from(document.querySelectorAll(selector)); }
+    window.markTF = function(){
+      const rows = getRows('#ex1 .q');
+      tfKey.forEach((v,i)=>{
+        const q = rows[i]; if(!q) return; // guard
+        q.classList.remove('wrong','right');
+        const chosen = (document.querySelector(`input[name=tf${i+1}]:checked`)||{}).value;
+        if(chosen){ q.classList.add(chosen===v? 'right':'wrong'); }
+      });
+    };
+    window.checkTF = function(){
+      let score=0; let total=tfKey.length;
+      tfKey.forEach((v,i)=>{ const chosen=(document.querySelector(`input[name=tf${i+1}]:checked`)||{}).value; if(chosen===v) score++; });
+      markTF();
+      const box=document.getElementById('tfFeedback'); if(box){ box.innerHTML = ` <span class="score">${score}/${total}</span> ${score===total? 'Brilliant!':'Keep going!'} `; }
+      saveProgress();
+    };
+
+    // 2) Q&A with keyword checking
+    window.QA = [ ['11','eleven'], ['detective books','detective'], ['football'], ['minecraft'], ['kindergarten','nursery'], ['chess'], ['roses','rose'], ['2','two'] ];
+    function normalise(s){return (s||'').toString().trim().toLowerCase();}
+    window.highlightQA = function(){
+      const rows = getRows('#ex2 .q');
+      QA.forEach((arr,i)=>{
+        const q = rows[i]; if(!q) return;
+        q.classList.remove('wrong','right');
+        const val = normalise((document.getElementById('a'+(i+1))||{}).value);
+        const ok = arr.some(k=> val.includes(k));
+        if(val){ q.classList.add(ok? 'right':'wrong'); }
+      });
+    };
+    window.checkQA = function(){
+      let score=0; let total=QA.length;
+      for(let i=1;i<=total;i++){
+        const val = normalise((document.getElementById('a'+i)||{}).value);
+        const ok = QA[i-1].some(k=> val.includes(k));
+        if(ok) score++;
+      }
+      highlightQA();
+      const box=document.getElementById('qaFeedback'); if(box){ box.innerHTML = ` <span class="score">${score}/${total}</span> ${score===total? 'Top marks!':'Nice effort!'} `; }
+      saveProgress();
+    };
+
+    // 3) Fill in the gaps — DRAG & DROP
+    window.bankWords = ['11','doctor','bus driver','football','computer games','singing','chess','roses'];
+    window.gapKey = ['11','doctor','bus driver','football','computer games','singing','chess','roses'];
+    const bank = document.getElementById('bank');
+
+    function drawBank(){
+      if(!bank) return;
+      bank.innerHTML='';
+      bankWords.forEach((w,idx)=>{
+        const chip = document.createElement('div');
+        chip.className='chip'; chip.textContent=w; chip.setAttribute('draggable','true'); chip.id = 'chip'+idx;
+        chip.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain', JSON.stringify({word:w, id:chip.id})); });
+        bank.appendChild(chip);
+      });
+    }
+    drawBank();
+
+    // Make inputs droppable
+    document.querySelectorAll('.dropzone').forEach(inp=>{
+      inp.addEventListener('dragover',e=>{ e.preventDefault(); inp.style.outline='2px dashed var(--accent5)'; });
+      inp.addEventListener('dragleave',()=>{ inp.style.outline='none'; });
+      inp.addEventListener('drop',e=>{
+        e.preventDefault(); inp.style.outline='none';
+        const raw = e.dataTransfer.getData('text/plain'); if(!raw) return;
+        const data = JSON.parse(raw);
+        inp.value = data.word;
+        const chip = document.getElementById(data.id); if(chip) chip.classList.add('used');
+      });
+      // double-click to clear
+      inp.addEventListener('dblclick',()=>{ inp.value=''; });
+    });
+
+    window.highlightGaps = function(){
+      const rows = getRows('#ex3 .q');
+      gapKey.forEach((ans,i)=>{
+        const q = rows[i]; if(!q) return;
+        q.classList.remove('wrong','right');
+        const v = normalise((document.getElementById('g'+(i+1))||{}).value);
+        if(v){ q.classList.add(v===ans? 'right':'wrong'); }
+      });
+    };
+    window.checkGaps = function(){
+      let score=0; let total=gapKey.length;
+      gapKey.forEach((ans,idx)=>{ const v = normalise((document.getElementById('g'+(idx+1))||{}).value); if(v===ans) score++; });
+      highlightGaps();
+      const box=document.getElementById('gapFeedback'); if(box){ box.innerHTML = ` <span class=\"score\">${score}/${total}</span> ${score===total? 'Spot on!':'Have another go!'} `; }
+      saveProgress();
+    };
+
+    // 4) Matching A–H
+    window.matchKey = ['A','B','C','D','E','F','G','H'];
+    window.highlightMatch = function(){
+      const rows = getRows('#ex4 .q');
+      matchKey.forEach((ans,i)=>{
+        const q = rows[i]; if(!q) return;
+        q.classList.remove('wrong','right');
+        const v = ((document.getElementById('m'+(i+1))||{}).value||'').toUpperCase();
+        if(v){ q.classList.add(v===ans? 'right':'wrong'); }
+      });
+    };
+    window.checkMatch = function(){
+      let score=0; let total=matchKey.length;
+      for(let i=1;i<=total;i++){
+        const v = ((document.getElementById('m'+i)||{}).value||'').toUpperCase();
+        if(v===matchKey[i-1]) score++;
+      }
+      highlightMatch();
+      const box=document.getElementById('matchFeedback'); if(box){ box.innerHTML = ` <span class=\"score\">${score}/${total}</span> ${score===total? 'Perfect match!':'Try to match again!'} `; }
+      saveProgress();
+    };
+
+    // 5) Multiple choice
+    window.mcKey = ['11','doctor','bus driver','9','sister','chess','roses','dog'];
+    window.highlightMC = function(){
+      const rows = getRows('#ex5 .q');
+      mcKey.forEach((ans,i)=>{
+        const q = rows[i]; if(!q) return;
+        q.classList.remove('wrong','right');
+        const chosen = (document.querySelector(`input[name=mc${i+1}]:checked`)||{}).value;
+        if(chosen){ q.classList.add(chosen===ans? 'right':'wrong'); }
+      });
+    };
+    window.checkMC = function(){
+      let score=0; let total=mcKey.length;
+      mcKey.forEach((ans,i)=>{ const chosen=(document.querySelector(`input[name=mc${i+1}]:checked`)||{}).value; if(chosen===ans) score++; });
+      highlightMC();
+      const box=document.getElementById('mcFeedback'); if(box){ box.innerHTML = ` <span class=\"score\">${score}/${total}</span> ${score===total? 'Yay!':'Good try!'} `; }
+      saveProgress();
+    };
+
+    // Show/hide key
+    window.toggleKey = function(id){ const el=document.getElementById(id); if(el){ el.style.display = (el.style.display==='none')? 'block':'none'; } };
+
+    // Writing helpers
+    window.countSentences = function(){
+      const t = (document.getElementById('writing')||{}).value || '';
+      const n = (t.match(/[.!?](\s|$)/g)||[]).length || (t.trim()?1:0);
+      const out = document.getElementById('countOut'); if(out){ out.textContent = `${n} sentence${n===1?'':'s'}`; }
+    };
+    window.saveWriting = function(){ const area=document.getElementById('writing'); if(area){ localStorage.setItem('msd-writing', area.value); } countSentences(); };
+
+    // Save & restore progress
+    window.saveProgress = function(){
+      const state = {
+        tf: Array.from({length:8},(_,i)=> (document.querySelector(`input[name=tf${i+1}]:checked`)||{}).value || ''),
+        qa: Array.from({length:8},(_,i)=> (document.getElementById('a'+(i+1))||{}).value || ''),
+        gaps: Array.from({length:8},(_,i)=> (document.getElementById('g'+(i+1))||{}).value || ''),
+        match: Array.from({length:8},(_,i)=> (document.getElementById('m'+(i+1))||{}).value || ''),
+        mc: Array.from({length:8},(_,i)=> (document.querySelector(`input[name=mc${i+1}]:checked`)||{}).value || ''),
+      };
+      localStorage.setItem('msd-progress', JSON.stringify(state));
+    };
+    function restore(){
+      const writing = localStorage.getItem('msd-writing'); if(writing && document.getElementById('writing')) document.getElementById('writing').value = writing;
+      const raw = localStorage.getItem('msd-progress'); if(!raw) return;
+      try{
+        const s = JSON.parse(raw);
+        (s.tf||[]).forEach((v,i)=>{ if(v){ const el = document.querySelector(`input[name=tf${i+1}][value='${v}']`); if(el) el.checked=true; }});
+        (s.qa||[]).forEach((v,i)=>{ const el=document.getElementById('a'+(i+1)); if(el) el.value=v; });
+        (s.gaps||[]).forEach((v,i)=>{ const el=document.getElementById('g'+(i+1)); if(el) el.value=v; });
+        (s.match||[]).forEach((v,i)=>{ const el=document.getElementById('m'+(i+1)); if(el) el.value=v; });
+        (s.mc||[]).forEach((v,i)=>{ if(v){ const el=document.querySelector(`input[name=mc${i+1}][value='${v}']`); if(el) el.checked=true; } });
+      }catch(e){ console.warn('Restore error',e) }
+    }
+    restore();
+
+    // Autosave
+    document.addEventListener('input', (e)=>{ if(e.target.closest('.exercise')) saveProgress(); });
+
+    // Quick tests
+    window.runTests = function(){
+      const out = document.getElementById('testOut');
+      const counts = {
+        ex1: getRows('#ex1 .q').length,
+        ex2: getRows('#ex2 .q').length,
+        ex3: getRows('#ex3 .q').length,
+        ex4: getRows('#ex4 .q').length,
+        ex5: getRows('#ex5 .q').length,
+      };
+      let html = `<p>Counts — ex1:${counts.ex1}, ex2:${counts.ex2}, ex3:${counts.ex3}, ex4:${counts.ex4}, ex5:${counts.ex5}</p>`;
+      const okCounts = Object.values(counts).every(v=>v===8);
+      html += `<p>${okCounts? '✅ All exercises have 8 items.' : '❌ Some exercise does not have 8 items.'}</p>`;
+      try{ markTF(); highlightQA(); highlightGaps(); highlightMatch(); highlightMC(); html += '<p>✅ Highlight functions executed without errors.</p>'; }
+      catch(e){ html += `<p>❌ Error during highlight: ${e.message}</p>`; }
+      if(out) out.innerHTML = html;
+    };
+  });
+</script>
+</body>
+</html>
